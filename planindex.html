@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>计划与打卡 · 移动端产品原型（10 页）</title>
+<style>
+:root{
+  --ink:#15302A;
+  --ink-2:#1D3B32;
+  --ink-3:#2C4F44;
+  --cream:#F7F4EA;
+  --cream-2:#F1EDE0;
+  --paper:#FFFFFF;
+  --line:#E7E1D2;
+  --line-strong:#DCD5C1;
+  --lime:#D8E97E;
+  --lime-soft:#EDF4C2;
+  --mint:#E9F1E4;
+  --sage:#7E9E82;
+  --orange:#E8A87A;
+  --danger:#C0563F;
+  --muted:#8B8B7C;
+  --muted-2:#A8A596;
+  --font-sans:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-serif:"Songti SC","Source Han Serif SC","Noto Serif SC","SimSun",Georgia,serif;
+  --r-lg:26px; --r-md:20px; --r-sm:14px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:var(--font-sans);
+  color:var(--ink);
+  background:
+    radial-gradient(1100px 520px at 10% -12%, #F0ECDE 0%, rgba(240,236,222,0) 62%),
+    radial-gradient(900px 480px at 92% 4%, #EAE7D8 0%, rgba(234,231,216,0) 60%),
+    #E4E0D2;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:48px;
+}
+button{font-family:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit}
+.ico{width:20px;height:20px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ico.fill{fill:currentColor;stroke:none}
+
+/* ============ toolbar ============ */
+.toolbar{
+  position:sticky;top:0;z-index:80;
+  display:flex;align-items:center;gap:20px;
+  padding:12px 24px;
+  background:rgba(247,244,234,.93);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-mark{width:36px;height:36px;border-radius:12px;background:var(--ink);color:var(--lime);display:grid;place-items:center}
+.brand-mark .ico{width:19px;height:19px}
+.brand-name{font-size:14.5px;font-weight:700;letter-spacing:.02em}
+.brand-sub{font-size:10px;letter-spacing:.14em;color:var(--muted-2);text-transform:uppercase;margin-top:2px}
+.seg{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--cream-2);border:1px solid var(--line)}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.01em;white-space:nowrap;transition:.18s}
+.seg button.on{background:var(--ink);color:var(--cream)}
+.pager{display:flex;gap:5px;flex-wrap:nowrap;margin-left:auto}
+.pager button{
+  min-width:30px;height:28px;padding:0 8px;border-radius:9px;border:1px solid var(--line);
+  background:var(--paper);font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;
+}
+.pager button.on{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.app.board .pager{display:none}
+.toolbar-hint{margin-left:auto;font-size:11.5px;color:var(--muted-2);letter-spacing:.02em}
+@media (max-width:1320px){.toolbar-hint{display:none}}
+
+/* ============ stage / screens ============ */
+.stage{padding:26px 24px 20px}
+.app.board .stage{display:grid;grid-template-columns:repeat(auto-fill,375px);gap:36px 34px;justify-content:center;align-items:start}
+.app.demo .stage{display:flex;justify-content:center;padding:24px 20px 40px}
+.app.board .screen{display:block;cursor:pointer}
+.app.demo .screen{display:none}
+.app.demo .screen.active{display:block}
+.frame-label{display:none;align-items:center;gap:8px;font-size:12px;color:#6C6C5E;letter-spacing:.03em;margin-bottom:10px}
+.frame-label span{background:var(--lime-soft);color:var(--ink);font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;letter-spacing:.06em}
+.app.board .frame-label{display:flex}
+.app.demo .screen.active .frame-label{display:flex;justify-content:center;margin-bottom:12px}
+.app.demo .screen.active .frame-label span{background:var(--ink);color:var(--lime)}
+
+.phone{
+  position:relative;width:375px;height:812px;flex:0 0 812px;
+  display:flex;flex-direction:column;overflow:hidden;
+  background:var(--cream);border-radius:38px;
+  box-shadow:0 22px 48px rgba(21,48,42,.14), 0 0 0 1px rgba(21,48,42,.06);
+  transition:box-shadow .2s;
+}
+.app.demo .phone{box-shadow:0 32px 72px rgba(21,48,42,.24), 0 0 0 1px rgba(21,48,42,.07)}
+.statusbar{height:46px;flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 26px;font-size:13.5px;font-weight:700;letter-spacing:.02em}
+.statusbar.on-dark{color:#F2EFE0}
+.sb-icons{display:flex;align-items:center;gap:5px}
+.sb-icons svg{fill:currentColor;stroke:none}
+.viewport{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;position:relative}
+.viewport::-webkit-scrollbar{display:none}
+.viewport.pad{padding:0 20px 22px}
+.viewport.flush{padding:0}
+
+/* ============ typography ============ */
+.display{font-family:var(--font-serif);font-size:30px;line-height:1.3;font-weight:700;letter-spacing:.01em;margin:0 0 8px}
+.sub{margin:0 0 20px;font-size:13.5px;line-height:1.65;color:var(--muted)}
+.eyebrow{font-size:10px;letter-spacing:.2em;color:var(--muted-2);text-transform:uppercase;font-weight:600}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px}
+.sec-head h3{margin:0;font-size:15.5px;font-weight:700;letter-spacing:.01em;display:flex;align-items:center;gap:7px}
+.sec-head h3 .count{font-size:11.5px;font-weight:600;color:var(--muted);background:var(--cream-2);border-radius:999px;padding:2px 7px}
+.text-link{border:0;background:transparent;color:var(--ink-3);font-size:12.5px;font-weight:600;padding:4px 0;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.text-link .ico{width:14px;height:14px;stroke-width:2}
+.link{border:0;background:transparent;color:var(--ink-3);font-size:12.5px;font-weight:600;padding:2px;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.hint{margin:14px 2px 0;font-size:11.5px;line-height:1.6;color:var(--muted-2)}
+
+/* ============ controls ============ */
+.btn{
+  width:100%;height:52px;border:0;border-radius:17px;background:var(--ink);color:#F6F3E6;
+  font-size:15.5px;font-weight:600;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .12s, box-shadow .2s, background .2s;
+  box-shadow:0 10px 22px rgba(21,48,42,.18);
+}
+.btn .ico{width:18px;height:18px;stroke-width:2}
+.btn:active{transform:translateY(1px) scale(.995);box-shadow:0 4px 12px rgba(21,48,42,.16)}
+.btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line-strong);box-shadow:none;font-weight:600}
+.btn.ghost:active{background:var(--cream-2)}
+.btn.lime{background:var(--lime);color:var(--ink);box-shadow:0 10px 22px rgba(120,140,50,.22)}
+.btn.sm{height:44px;font-size:14px;border-radius:14px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line-strong);background:var(--paper);color:var(--ink);display:grid;place-items:center;flex:0 0 auto;transition:.15s}
+.icon-btn .ico{width:19px;height:19px}
+.icon-btn:active{background:var(--cream-2)}
+.icon-btn.clear{border:0;background:transparent}
+.topbar{flex:0 0 auto;display:grid;grid-template-columns:38px 1fr 38px;align-items:center;gap:10px;padding:4px 18px 12px;min-height:52px}
+.topbar h1{margin:0;text-align:center;font-size:15.5px;font-weight:700;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar .right{justify-self:end;font-size:12.5px;font-weight:600;color:var(--ink-3);background:transparent;border:0;padding:4px 0}
+.field{display:block;margin-bottom:14px}
+.field > span{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:600;color:#6F6F60;margin-bottom:7px}
+.field > span em{font-style:normal;font-weight:500;color:var(--muted-2);font-size:11px}
+.input{
+  width:100%;height:50px;border-radius:15px;border:1px solid var(--line);background:var(--paper);
+  padding:0 14px;font-size:14.5px;color:var(--ink);transition:.15s;
+}
+.input::placeholder{color:#B4B1A2}
+.input:focus,.textarea:focus{outline:none;border-color:var(--ink-3);box-shadow:0 0 0 3px rgba(21,48,42,.07)}
+.textarea{width:100%;min-height:96px;border-radius:15px;border:1px solid var(--line);background:var(--paper);padding:13px 14px;font-size:14.5px;color:var(--ink);line-height:1.6;resize:none;transition:.15s}
+.input-wrap{position:relative;display:flex;align-items:center}
+.input-wrap .lead{position:absolute;left:14px;color:var(--muted-2);display:flex}
+.input-wrap .input{padding-left:42px}
+.input-wrap .eye{position:absolute;right:10px;width:32px;height:32px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px}
+.input-wrap .eye .ico{width:18px;height:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:#5F5F51;font-size:12.5px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.chip .ico{width:14px;height:14px}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.chip.soft.on{background:var(--mint);border-color:var(--sage);color:var(--ink)}
+.checkbox{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:#6F6F60;cursor:pointer;user-select:none}
+.checkbox input{position:absolute;opacity:0;width:0;height:0}
+.checkbox .box{width:18px;height:18px;border-radius:6px;border:1.4px solid var(--line-strong);background:var(--paper);display:grid;place-items:center;flex:0 0 auto;transition:.15s}
+.checkbox .box .ico{width:12px;height:12px;stroke-width:2.6;color:transparent}
+.checkbox input:checked + .box{background:var(--ink);border-color:var(--ink)}
+.checkbox input:checked + .box .ico{color:var(--lime)}
+.switch{position:relative;width:46px;height:27px;border-radius:999px;border:0;background:var(--line-strong);transition:.2s;flex:0 0 auto}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.18);transition:.2s}
+.switch.on{background:var(--ink)}
+.switch.on::after{transform:translateX(19px);background:var(--lime)}
+
+/* ============ progress ============ */
+.progress{height:8px;border-radius:999px;background:rgba(21,48,42,.1);overflow:hidden}
+.progress > i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--ink-3),var(--sage));transition:width .55s cubic-bezier(.2,.8,.2,1)}
+.progress.lime{background:rgba(255,255,255,.18)}
+.progress.lime > i{background:linear-gradient(90deg,var(--lime),#BBD968)}
+.progress.thin{height:6px}
+
+/* ============ task rows ============ */
+.task-list{display:flex;flex-direction:column;gap:8px}
+.task-row{
+  display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:16px;background:var(--paper);
+  border:1px solid var(--line);cursor:pointer;transition:.15s;
+}
+.task-row:active{background:#FCFAF3}
+.task-check{position:absolute;opacity:0;width:0;height:0}
+.tick{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line-strong);display:grid;place-items:center;flex:0 0 auto;transition:.18s;color:transparent;background:#fff}
+.tick .ico{width:13px;height:13px;stroke-width:2.6}
+.task-check:checked + .tick{background:var(--ink);border-color:var(--ink);color:var(--lime)}
+.task-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.task-text b{font-size:14px;font-weight:600;line-height:1.35;letter-spacing:.01em}
+.task-text em{font-style:normal;font-size:11.5px;color:var(--muted-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-check:checked ~ .task-text b{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.task-tag{font-size:10.5px;font-weight:600;color:var(--sage);background:var(--mint);padding:4px 8px;border-radius:999px;flex:0 0 auto}
+.task-time{font-size:11.5px;color:var(--muted-2);flex:0 0 auto}
+.pill-btn{height:32px;padding:0 14px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--cream);font-size:12px;font-weight:600;flex:0 0 auto;transition:.18s;display:inline-flex;align-items:center;gap:4px}
+.pill-btn .ico{width:13px;height:13px}
+.pill-btn.done{background:var(--mint);border-color:var(--mint);color:var(--ink-3)}
+.pill-btn.ghost{background:var(--paper);border-color:var(--line-strong);color:var(--ink-3)}
+
+/* ============ tabbar ============ */
+.tabbar{
+  flex:0 0 auto;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;
+  height:72px;padding:8px 6px 10px;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:20;
+}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:0;color:var(--muted-2);font-size:10.5px;font-weight:600;letter-spacing:.02em;padding:0}
+.tab .ico{width:21px;height:21px;stroke-width:1.7}
+.tab .tab-ico{width:42px;height:28px;border-radius:11px;display:grid;place-items:center;transition:.18s}
+.tab.active{color:var(--ink)}
+.tab.active .tab-ico{background:var(--mint)}
+.tab.active .ico{stroke-width:2}
+
+/* ============ cards & misc ============ */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:16px}
+.dark{background:linear-gradient(150deg,var(--ink) 0%,#1B3A31 62%,#22453A 100%);color:#F3F0E2}
+.tag{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:10.5px;font-weight:600;background:var(--cream-2);color:#6E6E5F}
+.tag.lime{background:var(--lime-soft);color:#4A5A20}
+.tag.mint{background:var(--mint);color:var(--ink-3)}
+.tag.orange{background:#FAE7D8;color:#9A5F31}
+.tag.dark{background:rgba(255,255,255,.14);color:#EFEBDC}
+.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:linear-gradient(140deg,#E3D8C0,#C9D6B8);color:#3A4A32;flex:0 0 auto}
+.avatars{display:flex}
+.avatars i{width:26px;height:26px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-size:10px;font-weight:700;font-style:normal;margin-left:-8px;color:#2C3E24}
+.avatars i:first-child{margin-left:0}
+.avatars i:nth-child(1){background:#E9C9A8}
+.avatars i:nth-child(2){background:#CFE0BC}
+.avatars i:nth-child(3){background:#DCD9A9}
+
+/* ============ bottom bar ============ */
+.bottom-bar{flex:0 0 auto;padding:12px 18px 16px;background:linear-gradient(180deg,rgba(247,244,234,.2),var(--cream) 32%);border-top:1px solid rgba(231,225,210,.7)}
+.bottom-bar .bottom-hint{margin:9px 0 0;text-align:center;font-size:11px;color:var(--muted-2)}
+
+/* ============ sheet / toast ============ */
+.sheet{position:absolute;inset:0;z-index:60;display:none}
+.sheet.open{display:block}
+.sheet-backdrop{position:absolute;inset:0;background:rgba(14,30,25,.4);backdrop-filter:blur(2px);animation:fade .2s ease}
+.sheet-panel{
+  position:absolute;left:0;right:0;bottom:0;background:var(--cream);border-radius:28px 28px 0 0;
+  padding:10px 20px 24px;max-height:82%;overflow-y:auto;scrollbar-width:none;
+  box-shadow:0 -14px 44px rgba(14,30,25,.22);animation:up .28s cubic-bezier(.2,.85,.25,1);
+}
+.sheet-panel::-webkit-scrollbar{display:none}
+.sheet-grab{width:38px;height:4px;border-radius:2px;background:var(--line-strong);margin:4px auto 14px}
+.sheet-panel h3{margin:0 0 4px;font-size:17px;font-weight:700;font-family:var(--font-serif);letter-spacing:.01em}
+.sheet-panel .sheet-sub{margin:0 0 16px;font-size:12px;color:var(--muted);line-height:1.6}
+.sheet-actions{display:flex;gap:10px;margin-top:18px}
+.sheet-actions .btn{flex:1}
+.sheet-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;color:#5F5F51}
+.sheet-row:last-of-type{border-bottom:0}
+.sheet-row b{font-size:13.5px;color:var(--ink)}
+@keyframes up{from{transform:translateY(24%);opacity:.6}to{transform:translateY(0);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.toast{
+  position:absolute;left:50%;bottom:104px;transform:translate(-50%,8px);
+  background:rgba(21,48,42,.95);color:#F5F2E4;font-size:12.5px;font-weight:500;
+  padding:10px 18px;border-radius:999px;opacity:0;transition:.25s;z-index:80;pointer-events:none;
+  max-width:300px;text-align:center;line-height:1.4;box-shadow:0 10px 24px rgba(14,30,25,.28);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+/* ================= page specific ================= */
+/* p1 */
+.p1-hero{position:relative;flex:0 0 auto;height:248px;padding:0 24px;color:#EFEBDD;background:linear-gradient(158deg,#17352C 0%,#1E4034 56%,#27503F 100%)}
+.p1-hero::after{content:"";position:absolute;right:-46px;top:74px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(216,233,126,.16)}
+.p1-hero::before{content:"";position:absolute;right:34px;top:132px;width:96px;height:96px;border-radius:50%;border:1px solid rgba(216,233,126,.12)}
+.hero-top{padding-top:6px;position:relative;z-index:2}
+.hero-brand{display:flex;align-items:center;gap:9px}
+.hero-brand .mark{width:30px;height:30px;border-radius:10px;background:rgba(216,233,126,.16);color:var(--lime);display:grid;place-items:center}
+.hero-brand .mark .ico{width:17px;height:17px}
+.hero-name{font-family:var(--font-serif);font-size:19px;font-weight:700;letter-spacing:.08em}
+.hero-slogan{margin:13px 0 0;font-family:var(--font-serif);font-size:23px;line-height:1.46;letter-spacing:.03em;color:#F7F3E3}
+.hero-proof{position:absolute;left:24px;right:24px;bottom:36px;display:flex;align-items:center;gap:10px;z-index:2}
+.hero-proof p{margin:0;font-size:11px;color:rgba(240,236,220,.68)}
+.hero-proof b{color:var(--lime);font-size:12px}
+.p1-sheet{position:relative;z-index:3;flex:1 1 auto;margin-top:-26px;background:var(--cream);border-radius:30px 30px 0 0;padding:18px 24px 16px;overflow-y:auto;scrollbar-width:none;box-shadow:0 -10px 26px rgba(10,26,20,.13)}
+.p1-sheet::-webkit-scrollbar{display:none}
+.auth-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--cream-2);margin-bottom:20px}
+.auth-seg button{flex:1;height:40px;border:0;border-radius:999px;background:transparent;font-size:13.5px;font-weight:600;color:var(--muted);transition:.18s}
+.auth-seg button.on{background:var(--paper);color:var(--ink);box-shadow:0 4px 12px rgba(21,48,42,.09)}
+.auth-panel[hidden]{display:none}
+.auth-panel .display{font-size:27px;margin-bottom:6px}
+.auth-panel .sub{margin-bottom:18px;font-size:12.5px}
+.auth-options{display:flex;align-items:center;justify-content:space-between;margin:2px 0 16px}
+.divider{display:flex;align-items:center;gap:10px;margin:15px 0 13px;color:var(--muted-2);font-size:10.5px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.legal{margin:14px 0 0;text-align:center;font-size:10px;line-height:1.6;color:var(--muted-2)}
+.legal b{color:var(--ink-3);font-weight:500}
+.code-btn{position:absolute;right:6px;height:32px;padding:0 10px;border-radius:9px;border:0;background:var(--mint);color:var(--ink-3);font-size:11.5px;font-weight:700}
+
+/* p2 */
+.p2-head{display:flex;align-items:center;justify-content:space-between;padding:2px 20px 0}
+.step-badge{font-size:10.5px;letter-spacing:.09em;font-weight:600;color:#6E6E5F;background:var(--cream-2);padding:6px 12px;border-radius:999px}
+.p2-body{padding:20px 20px 0}
+.p2-body .display{font-size:29px;margin-bottom:9px}
+.p2-body .sub{margin-bottom:18px}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cat{display:flex;align-items:center;gap:9px;padding:11px;border-radius:15px;border:1px solid var(--line);background:var(--paper);text-align:left;transition:.16s}
+.cat .ci{width:32px;height:32px;border-radius:10px;background:var(--cream-2);display:grid;place-items:center;color:var(--ink-3);flex:0 0 auto}
+.cat .ci .ico{width:16px;height:16px}
+.cat b{display:block;font-size:13px;font-weight:600;line-height:1.2}
+.cat em{display:block;font-style:normal;font-size:9.5px;color:var(--muted-2);margin-top:3px}
+.cat.wide{grid-column:span 2;justify-content:flex-start}
+.cat.on{border-color:var(--sage);background:var(--mint);box-shadow:0 0 0 2px rgba(126,158,130,.16)}
+.cat.on .ci{background:var(--ink);color:var(--lime)}
+.quick-days{display:flex;gap:7px;margin-top:9px}
+.quick-days button{flex:1;height:32px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font-size:11.5px;font-weight:600;color:#5F5F51}
+.quick-days button.on{background:var(--mint);border-color:var(--sage);color:var(--ink)}
+
+/* p3 */
+.home-head{display:flex;align-items:flex-start;justify-content:space-between;padding:2px 20px 0}
+.home-date{margin:0;font-size:11px;color:var(--muted);letter-spacing:.04em}
+.home-greet{margin:7px 0 0;font-family:var(--font-serif);font-size:24px;font-weight:700;letter-spacing:.03em}
+.avatar-btn{width:40px;height:40px;border-radius:50%;border:0;background:linear-gradient(140deg,#E3D8C0,#C9D6B8);color:#3A4A32;font-size:13px;font-weight:700;display:grid;place-items:center;margin-top:2px}
+.quick-actions{display:flex;gap:9px;padding:15px 20px 0}
+.quick{flex:1;height:44px;border-radius:14px;border:1px solid var(--ink);background:var(--ink);color:var(--cream);font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s}
+.quick:active{transform:translateY(1px)}
+.quick.ghost{background:var(--paper);color:var(--ink);border-color:var(--line-strong)}
+.quick .ico{width:16px;height:16px}
+.today-card{position:relative;overflow:hidden;margin:14px 20px 0;border-radius:22px;padding:15px 17px 16px;background:linear-gradient(150deg,#17352C 0%,#1E4034 60%,#27503F 100%);color:#EFEBDD}
+.today-card::after{content:"";position:absolute;right:-30px;bottom:-54px;width:150px;height:150px;border-radius:50%;border:1px solid rgba(216,233,126,.15)}
+.today-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+.today-top > span{font-size:11.5px;color:rgba(240,236,220,.68)}
+.today-top b span{font-size:inherit;color:inherit}
+.today-top b{font-family:var(--font-serif);font-size:24px;color:var(--lime);letter-spacing:.01em}
+.today-top b small{font-size:12px;font-family:var(--font-sans);color:rgba(240,236,220,.6);font-weight:500}
+.today-card .progress{margin-top:9px;height:7px;position:relative;z-index:2}
+.today-note{margin:8px 0 0;font-size:11px;color:rgba(240,236,220,.62);position:relative;z-index:2}
+.home-sec{padding:0 20px}
+.habit-row{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:16px;background:var(--paper);border:1px solid var(--line);margin-bottom:8px}
+.habit-ico{width:33px;height:33px;border-radius:11px;background:var(--mint);color:var(--ink-3);display:grid;place-items:center;flex:0 0 auto}
+.habit-ico .ico{width:16px;height:16px}
+.habit-row .info{flex:1;min-width:0}
+.habit-row b{display:block;font-size:13px;font-weight:600}
+.habit-row em{display:block;font-style:normal;font-size:10.5px;color:var(--muted-2);margin-top:2px}
+.goal-mini{margin-bottom:9px;padding:13px 14px;border-radius:17px;background:var(--paper);border:1px solid var(--line);cursor:pointer}
+.goal-mini:active{background:#FCFAF3}
+.gm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.gm-pct{font-size:12px;font-weight:700;color:var(--ink-3)}
+.goal-mini h4{margin:0 0 9px;font-size:14px;font-weight:600;letter-spacing:.01em}
+.goal-mini p{margin:8px 0 0;font-size:10.5px;color:var(--muted-2)}
+
+/* p4 */
+.banner{position:relative;overflow:hidden;margin:0 20px 18px;border-radius:22px;padding:17px 18px}
+.banner .be{margin:0 0 8px;font-size:9px;letter-spacing:.24em;color:rgba(216,233,126,.78);font-weight:600}
+.banner h2{margin:0;font-family:var(--font-serif);font-size:22px;line-height:1.45;color:#F7F3E3;letter-spacing:.02em}
+.banner .bn{margin:10px 0 0;font-size:10.5px;color:rgba(240,236,220,.6)}
+.banner .bi{position:absolute;right:14px;top:14px;width:50px;height:50px;border-radius:50%;border:1px solid rgba(216,233,126,.3);display:grid;place-items:center;color:var(--lime)}
+.banner .bi .ico{width:22px;height:22px}
+.counter{font-size:10px;color:var(--muted-2);font-weight:500}
+.date-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+/* p5 */
+.goal-hero{margin:0 20px;border-radius:22px;padding:16px 17px}
+.gh-desc{margin:0 0 14px;font-size:12px;line-height:1.7;color:rgba(243,240,226,.76)}
+.gh-grid{display:flex;align-items:flex-end;justify-content:space-between}
+.gh-grid .k{display:block;font-size:10px;color:rgba(243,240,226,.58);margin-bottom:4px}
+.gh-grid .v{font-family:var(--font-serif);font-size:26px;line-height:1;font-weight:700}
+.gh-grid .v small{font-family:var(--font-sans);font-size:11px;margin-left:2px;font-weight:500;color:rgba(243,240,226,.7)}
+.gh-grid .v.lime{color:var(--lime)}
+.gh-grid .right{text-align:right}
+.goal-hero .progress{margin-top:13px;height:7px}
+.gh-meta{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.12);font-size:10.5px;color:rgba(243,240,226,.62)}
+.gh-meta span{display:flex;align-items:center;gap:4px}
+.gh-meta .ico{width:13px;height:13px}
+.gh-meta .dot-sep{color:rgba(243,240,226,.3)}
+.stat-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:13px 20px 0}
+.stat-trio > div{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:10px 11px}
+.stat-trio span{display:block;font-size:10px;color:var(--muted-2)}
+.stat-trio b{font-family:var(--font-serif);font-size:20px;display:inline-block;margin-top:3px;line-height:1}
+.stat-trio em{font-style:normal;font-size:10px;color:var(--muted-2);margin-left:2px}
+.stage-card{background:var(--paper);border:1px solid var(--line);border-radius:17px;overflow:hidden;margin-bottom:9px}
+.stage-head{width:100%;display:flex;align-items:center;gap:10px;padding:12px 13px;background:transparent;border:0;text-align:left}
+.stage-no{width:30px;height:30px;border-radius:50%;background:var(--mint);color:var(--ink-3);display:grid;place-items:center;font-size:11.5px;font-weight:700;flex:0 0 auto;font-family:var(--font-serif)}
+.stage-card.active .stage-no{background:var(--ink);color:var(--lime)}
+.stage-info{flex:1;min-width:0}
+.stage-info b{display:block;font-size:13px;font-weight:600;letter-spacing:.01em}
+.stage-info em{display:block;font-style:normal;font-size:10px;color:var(--muted-2);margin-top:3px}
+.chev{width:16px;height:16px;color:var(--muted-2);transition:.2s;flex:0 0 auto}
+.stage-card.open .chev{transform:rotate(180deg)}
+.stage-body{display:none;padding:0 13px 11px;border-top:1px solid var(--line)}
+.stage-card.open .stage-body{display:block}
+.stage-task{display:flex;align-items:center;gap:9px;padding:9px 0;font-size:12.5px;color:#3E3E33}
+.stage-task .dot{width:17px;height:17px;border-radius:50%;border:1.4px solid var(--line-strong);display:grid;place-items:center;color:transparent;flex:0 0 auto}
+.stage-task .dot .ico{width:10px;height:10px;stroke-width:2.8}
+.stage-task.done .dot{background:var(--ink);border-color:var(--ink);color:var(--lime)}
+.stage-task.done span{color:var(--muted);text-decoration:line-through}
+.stage-task span{flex:1;min-width:0}
+.stage-task em{font-style:normal;font-size:10px;color:var(--muted-2);flex:0 0 auto}
+.add-task{width:100%;margin-top:7px;height:36px;border-radius:11px;border:1px dashed var(--line-strong);background:transparent;color:var(--ink-3);font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px}
+.add-task .ico{width:14px;height:14px}
+.recent{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;margin-bottom:7px;border-radius:14px;background:var(--paper);border:1px solid var(--line);text-align:left;font-size:12px;color:#3E3E33}
+.recent .ric{width:27px;height:27px;border-radius:9px;background:var(--cream-2);display:grid;place-items:center;color:var(--ink-3);flex:0 0 auto}
+.recent .ric .ico{width:14px;height:14px}
+.recent .rt{flex:1;min-width:0}
+.recent .rt b{display:block;font-size:12.5px;font-weight:600}
+.recent .rt em{font-style:normal;font-size:10px;color:var(--muted-2);margin-top:2px;display:block}
+.recent .rd{font-size:10.5px;color:var(--muted-2);flex:0 0 auto}
+
+/* p6 */
+.date-switch{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 20px;padding:9px 10px;border-radius:16px;background:var(--paper);border:1px solid var(--line)}
+.date-switch .ds-mid{text-align:center;flex:1}
+.date-switch b{display:block;font-size:14.5px;font-weight:700;letter-spacing:.01em}
+.date-switch span{display:block;font-size:10px;color:var(--muted-2);margin-top:2px}
+.date-switch .icon-btn{width:32px;height:32px;border-radius:10px}
+.date-switch .icon-btn .ico{width:16px;height:16px}
+.group-label{display:flex;align-items:center;gap:7px;margin:18px 0 9px;font-size:13.5px;font-weight:700}
+.group-label .count{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--cream-2);border-radius:999px;padding:2px 7px}
+.empty{padding:34px 0;text-align:center;color:var(--muted-2);font-size:12px}
+.empty .ico{width:34px;height:34px;margin:0 auto 10px;color:var(--line-strong);display:block}
+
+/* p7 */
+.month-bar{display:flex;align-items:center;gap:7px;margin:2px 20px 10px}
+.month-bar b{font-family:var(--font-serif);font-size:19px;letter-spacing:.02em}
+.month-bar .icon-btn{width:30px;height:30px;border-radius:9px}
+.month-bar .icon-btn .ico{width:15px;height:15px}
+.month-bar .text-link{margin-left:auto;font-size:11.5px}
+.cal-card{margin:0 20px;padding:11px 9px 13px;border-radius:18px;background:var(--paper);border:1px solid var(--line)}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10px;color:var(--muted-2);margin-bottom:5px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day{position:relative;height:38px;border:0;background:transparent;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11.5px;color:#4A4A3E;transition:.15s}
+.cal-day.out{color:#CFCBBB}
+.cal-day .mark{width:4px;height:4px;border-radius:50%;background:var(--sage);opacity:0}
+.cal-day.hit{background:var(--mint);color:var(--ink-3);font-weight:700}
+.cal-day.hit .mark{opacity:1;background:var(--ink-3)}
+.cal-day.today{box-shadow:inset 0 0 0 1.4px var(--ink);font-weight:700}
+.cal-legend{display:flex;align-items:center;gap:7px;margin:10px 24px 0;font-size:10.5px;color:var(--muted-2)}
+.cal-legend .sw{width:16px;height:16px;border-radius:6px;background:var(--mint);position:relative}
+.cal-legend .sw::after{content:"";position:absolute;left:6.5px;top:6.5px;width:3px;height:3px;border-radius:50%;background:var(--ink-3)}
+.cal-legend .sw.ring{background:transparent;box-shadow:inset 0 0 0 1.4px var(--ink)}
+.cal-legend .sw.ring::after{display:none}
+.cal-legend span{margin-right:8px}
+.habit-line{display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:16px;background:var(--paper);border:1px solid var(--line);margin-bottom:8px}
+.habit-line .info{flex:1;min-width:0}
+.habit-line b{display:block;font-size:13px}
+.habit-line em{font-style:normal;display:block;font-size:10px;color:var(--muted-2);margin-top:3px}
+.habit-line .streak{font-size:10.5px;color:var(--orange);font-weight:600}
+
+/* p8 */
+.range-seg{display:flex;gap:4px;padding:4px;margin:0 20px;border-radius:999px;background:var(--cream-2);border:1px solid var(--line)}
+.range-seg button{flex:1;height:36px;border:0;border-radius:999px;background:transparent;font-size:12.5px;font-weight:600;color:var(--muted)}
+.range-seg button.on{background:var(--ink);color:var(--cream);box-shadow:0 4px 10px rgba(21,48,42,.18)}
+.range-note{margin:10px 20px 0;font-size:10.5px;color:var(--muted-2);text-align:center;letter-spacing:.02em}
+.stat-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 20px 0}
+.stat-card{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:10px}
+.stat-card > span{display:block;font-size:9.5px;color:var(--muted-2);line-height:1.4}
+.stat-card b span{display:inline;font-size:inherit;color:inherit;font-weight:inherit;line-height:1;font-family:inherit}
+.stat-card b{display:block;font-family:var(--font-serif);font-size:21px;margin-top:5px;line-height:1}
+.stat-card b i{font-style:normal;font-size:11px;font-family:var(--font-sans);margin-left:1px}
+.stat-card em{display:block;font-style:normal;font-size:9px;color:var(--sage);margin-top:4px}
+.chart-card{margin:13px 20px 0;background:var(--paper);border:1px solid var(--line);border-radius:19px;padding:14px 13px 11px}
+.chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.chart-head b{font-size:13px;letter-spacing:.01em}
+.chart-legend{display:flex;gap:9px;font-size:9px;color:var(--muted-2)}
+.chart-legend i{width:7px;height:7px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:middle}
+.chart{display:flex;align-items:flex-end;gap:6px;height:130px;padding-top:4px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:5px;min-width:0}
+.bar-track{flex:1;display:flex;align-items:flex-end}
+.bar{width:100%;border-radius:5px 5px 3px 3px;background:linear-gradient(180deg,#3C6C59,#6C9679);min-height:3px;transition:height .5s cubic-bezier(.2,.8,.2,1)}
+.bar.hi{background:linear-gradient(180deg,#C3DC68,#8DB255)}
+.bar-wrap em{font-style:normal;font-size:8px;color:var(--muted-2);text-align:center;white-space:nowrap;overflow:hidden}
+.goal-progress{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.goal-progress .gi{width:30px;height:30px;border-radius:10px;background:var(--cream-2);display:grid;place-items:center;color:var(--ink-3);flex:0 0 auto}
+.goal-progress .gi .ico{width:15px;height:15px}
+.goal-progress .gt{flex:1;min-width:0}
+.goal-progress .gt b{display:block;font-size:12px;font-weight:600}
+.goal-progress .gt .progress{margin-top:5px;height:5px}
+.goal-progress .gp{font-size:11px;font-weight:700;color:var(--ink-3);flex:0 0 auto}
+.chart-tip{margin:9px 0 0;padding-top:9px;border-top:1px dashed var(--line);font-size:10px;color:var(--muted-2);display:flex;gap:5px;align-items:center}
+
+/* p9 */
+.searchbar{display:flex;align-items:center;gap:8px;height:44px;margin:0 20px;padding:0 12px;border-radius:14px;background:var(--paper);border:1px solid var(--line);color:var(--muted-2)}
+.searchbar .ico{width:16px;height:16px}
+.searchbar input{flex:1;border:0;background:transparent;outline:none;font-size:13px;color:var(--ink)}
+.searchbar input::placeholder{color:#B4B1A2}
+.filter-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:11px 20px 2px}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-row .chip{height:31px;padding:0 10px;font-size:11.5px;justify-content:center;width:100%}
+.tpl-card{margin:10px 20px 0;padding:13px;border-radius:17px;background:var(--paper);border:1px solid var(--line)}
+.tpl-top{display:flex;gap:10px;align-items:flex-start}
+.tpl-ico{width:37px;height:37px;border-radius:12px;background:var(--mint);display:grid;place-items:center;color:var(--ink-3);flex:0 0 auto}
+.tpl-ico .ico{width:18px;height:18px}
+.tpl-top .th{flex:1;min-width:0}
+.tpl-card h4{margin:1px 0 0;font-size:13.5px;font-weight:600;line-height:1.4}
+.tpl-meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:5px;font-size:9.5px;color:var(--muted-2)}
+.tpl-meta span{display:flex;align-items:center;gap:3px}
+.tpl-meta .ico{width:11px;height:11px}
+.tpl-actions{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.tpl-actions .who{font-size:9.5px;color:var(--muted-2)}
+.tpl-actions .use{height:30px;padding:0 13px;border-radius:999px;border:1px solid var(--ink);background:transparent;color:var(--ink);font-size:11.5px;font-weight:600}
+.tpl-actions .use:active{background:var(--ink);color:var(--cream)}
+.no-result{padding:44px 0;text-align:center;color:var(--muted-2);font-size:12px}
+
+/* p10 */
+.profile-hero{padding:0 20px 15px;border-radius:0 0 26px 26px;background:linear-gradient(150deg,#17352C,#1E4034 60%,#27503F);color:#EFEBDD}
+.profile-row{display:flex;align-items:center;gap:12px;padding-top:4px;position:relative;z-index:2}
+.avatar.lg{width:52px;height:52px;font-size:17px;border:1.5px solid rgba(216,233,126,.38);background:linear-gradient(140deg,#E5DAC0,#C9D6B8)}
+.profile-row h2{margin:0;font-family:var(--font-serif);font-size:18.5px;letter-spacing:.02em}
+.profile-row p{margin:4px 0 0;font-size:10.5px;color:rgba(240,236,220,.62)}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:12px;padding:10px 0;border-radius:15px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);position:relative;z-index:2}
+.profile-stats > div{text-align:center;border-right:1px solid rgba(255,255,255,.1)}
+.profile-stats > div:last-child{border-right:0}
+.profile-stats b{display:block;font-family:var(--font-serif);font-size:19px;color:#fff;line-height:1}
+.profile-stats span{display:block;font-size:9.5px;color:rgba(240,236,220,.6);margin-top:5px}
+.setting-card{margin:11px 20px 0;background:var(--paper);border:1px solid var(--line);border-radius:17px;overflow:hidden}
+.setting-row{display:flex;align-items:center;gap:10px;width:100%;padding:11px 13px;background:transparent;border:0;border-bottom:1px solid var(--line);text-align:left;color:inherit}
+.setting-row:last-child{border-bottom:0}
+.sr-ico{width:33px;height:33px;border-radius:11px;background:var(--cream-2);display:grid;place-items:center;color:var(--ink-3);flex:0 0 auto}
+.sr-ico .ico{width:16px;height:16px}
+.setting-row .txt{flex:1;min-width:0}
+.setting-row b{display:block;font-size:13px;font-weight:600}
+.setting-row em{display:block;font-style:normal;font-size:9.5px;color:var(--muted-2);margin-top:3px}
+.setting-row .chev{width:15px;height:15px;color:var(--muted-2)}
+.time-input{width:88px;height:31px;border-radius:9px;border:1px solid var(--line);background:var(--cream);color:var(--ink);font-size:11.5px;font-weight:600;padding:0 6px;flex:0 0 auto}
+.time-input:disabled{opacity:.35}
+.setting-row.sub{padding-top:0;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#FBFAF4)}
+.setting-row.sub .lab{font-size:10.5px;color:var(--muted-2);flex:1}
+.logout{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:46px;margin-top:16px;border-radius:14px;border:1px solid var(--line-strong);background:var(--paper);color:var(--danger);font-size:13px;font-weight:600}
+.logout .ico{width:15px;height:15px}
+.section-label{margin:12px 22px 2px;font-size:9.5px;letter-spacing:.2em;color:var(--muted-2);font-weight:600}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.8 12 4l8 6.8V20a1 1 0 0 1-1 1h-4.4v-6.2H9.4V21H5a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-check-sq" viewBox="0 0 24 24"><rect x="3.6" y="3.6" width="16.8" height="16.8" rx="5"/><path d="m8.2 12.2 2.6 2.6 5-5.4"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3.5 16.4l4.9-5.6 3.5 2.9 5.2-6.6"/><path d="M13.6 6.6h4.6v4.5"/><path d="M3.2 20.4h17.6"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.4" r="3.7"/><path d="M4.8 20.2c.8-3.6 3.7-5.6 7.2-5.6s6.4 2 7.2 5.6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.2v13.6M5.2 12h13.6"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.8" y="5.4" width="16.4" height="14.8" rx="3.4"/><path d="M8 3.4v3.6M16 3.4v3.6M3.8 10.2h16.4"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18.2 16.2H5.8c1-1.2 1.4-2.4 1.4-4.4 0-3.4 1.9-5.5 4.8-5.5s4.8 2.1 4.8 5.5c0 2 .4 3.2 1.4 4.4z"/><path d="M10 19.2a2.2 2.2 0 0 0 4 0"/><path d="M12 3.2v1.4"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5.4M11.4 5.8 5.2 12l6.2 6.2"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h13.6M12.6 5.8 18.8 12l-6.2 6.2"/></symbol>
+  <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M9.2 7H17v7.8"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9.5 6.5 5.5 5.5-5.5 5.5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.4"/><path d="m15.8 15.8 4.2 4.2"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.8" y="10.4" width="14.4" height="9.6" rx="3"/><path d="M8.2 10.4V8a3.8 3.8 0 0 1 7.6 0v2.4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.4" y="2.8" width="11.2" height="18.4" rx="3.2"/><path d="M10.4 18.4h3.2"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.8 12S6.2 6 12 6s9.2 6 9.2 6-3.4 6-9.2 6-9.2-6-9.2-6z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.4 4.6 4.6L19 6.6"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 20.4V4.2c2.6-1.2 5-1.2 7.4 0s4.8 1.2 7 0v9c-2.2 1.2-4.6 1.2-7 0s-4.8-1.2-7.4 0"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.4c.7 3.6 1.7 5 5.4 5.6-3.7.7-4.7 2-5.4 5.6-.7-3.6-1.7-5-5.4-5.6 3.7-.6 4.7-2 5.4-5.6z"/><path d="M17.6 15.4c.4 1.8.9 2.4 2.6 2.8-1.7.4-2.2 1-2.6 2.8-.4-1.8-.9-2.4-2.6-2.8 1.7-.4 2.2-1 2.6-2.8z"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3.4c3.4 3.4 5.8 6 5.8 9.4a5.8 5.8 0 0 1-11.6 0c0-2 .8-3.6 2-5.2.5 1.6 1.4 2.4 2.4 2.6-.4-2.6-.2-4.6 1.4-6.8z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.3C10.3 5 8.2 4.4 5.8 4.4v13.4c2.4 0 4.5.6 6.2 1.9 1.7-1.3 3.8-1.9 6.2-1.9V4.4c-2.4 0-4.5.6-6.2 1.9z"/><path d="M12 6.3v13.4"/></symbol>
+  <symbol id="i-run" viewBox="0 0 24 24"><circle cx="14.6" cy="4.6" r="2"/><path d="M13.4 10.2 9.8 12l-1.6 4M13.4 10.2l3 2.2 1.4 3.8M13.4 10.2 9.2 9 6.6 11M8.2 16l-2.4 4"/></symbol>
+  <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="4.6" y="4.6" width="14.8" height="10.6" rx="2"/><path d="M2.6 19.4h18.8"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20 4c-8 0-13 3.2-13 9a6 6 0 0 0 6 6c5.8 0 7-6.4 7-15z"/><path d="M4 20c1.4-4.4 4-7.6 8-10"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6.6h10.6M9 12h10.6M9 17.4h10.6"/><path d="M4.6 6.6h.01M4.6 12h.01M4.6 17.4h.01"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14.4 4.4H6.6a2 2 0 0 0-2 2v11.2a2 2 0 0 0 2 2h7.8"/><path d="M15.6 8.4 19.4 12l-3.8 3.6M19.4 12H9.6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M12 7.6V12l3 1.8"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M16.4 4.6l3 3-10 10-4 1 1-4z"/><path d="M4 20.4h16"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.6" height="6.6" rx="2"/><rect x="13.4" y="4" width="6.6" height="6.6" rx="2"/><rect x="4" y="13.4" width="6.6" height="6.6" rx="2"/><rect x="13.4" y="13.4" width="6.6" height="6.6" rx="2"/></symbol>
+  <symbol id="i-water" viewBox="0 0 24 24"><path d="M12 3.4c3.2 3.8 5.6 6.6 5.6 9.6a5.6 5.6 0 0 1-11.2 0c0-3 2.4-5.8 5.6-9.6z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.6A8.4 8.4 0 0 1 9.4 4a8.6 8.6 0 1 0 10.6 10.6z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.2 19.4 6v6.2c0 4-3 7-7.4 8.6-4.4-1.6-7.4-4.6-7.4-8.6V6z"/><path d="m9 12 2.2 2.2 4-4.2"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 4 2.4 5 5.4.7-4 3.7 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.7 5.4-.7z"/></symbol>
+  <symbol id="st-signal" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="1" fill="currentColor"/><rect x="4.7" y="5" width="3" height="6" rx="1" fill="currentColor"/><rect x="9.4" y="2.5" width="3" height="8.5" rx="1" fill="currentColor"/><rect x="14.1" y="0" width="3" height="11" rx="1" fill="currentColor"/></symbol>
+  <symbol id="st-wifi" viewBox="0 0 15 11"><path d="M7.5 9.5 5.1 7.1a3.4 3.4 0 0 1 4.8 0z" fill="currentColor"/><path d="M2.9 4.9 1 3a9.3 9.3 0 0 1 13 0l-1.9 1.9a6.6 6.6 0 0 0-9.2 0z" fill="currentColor"/></symbol>
+  <symbol id="st-battery" viewBox="0 0 24 11"><rect x="0.7" y="0.7" width="18.6" height="9.6" rx="2.8" fill="none" stroke="currentColor" stroke-width="1.1" opacity=".55"/><rect x="2.5" y="2.5" width="12" height="6" rx="1.6" fill="currentColor"/><path d="M21.4 3.8v3.4a1.9 1.9 0 0 0 0-3.4z" fill="currentColor" opacity=".55"/></symbol>
+</svg>
+
+<header class="toolbar">
+  <div class="brand">
+    <div class="brand-mark"><svg class="ico"><use href="#i-target"/></svg></div>
+    <div>
+      <div class="brand-name">计划与打卡</div>
+      <div class="brand-sub">Mobile Prototype · 375px</div>
+    </div>
+  </div>
+  <div class="seg" id="mode-seg">
+    <button data-mode="board" class="on">总览 · 10 页</button>
+    <button data-mode="demo">演示模式</button>
+  </div>
+  <div class="toolbar-hint" id="toolbar-hint">点击任意页面进入演示，页面间入口均可跳转</div>
+  <div class="pager" id="pager"></div>
+</header>
+
+<div class="app board" id="app">
+<main class="stage" id="stage">
+
+<!-- ============ 01 登录 / 注册 ============ -->
+<section class="screen" id="p1" data-name="登录 / 注册">
+  <div class="frame-label"><span>01</span>登录 / 注册</div>
+  <div class="phone">
+    <div class="p1-hero">
+      <div class="statusbar on-dark">
+        <span>9:41</span>
+        <span class="sb-icons">
+          <svg width="17" height="11"><use href="#st-signal"/></svg>
+          <svg width="15" height="11"><use href="#st-wifi"/></svg>
+          <svg width="24" height="11"><use href="#st-battery"/></svg>
+        </span>
+      </div>
+      <div class="hero-top">
+        <div class="hero-brand">
+          <span class="mark"><svg class="ico"><use href="#i-target"/></svg></span>
+          <span class="hero-name">计划与打卡</span>
+        </div>
+        <p class="hero-slogan">把想做的事，<br>变成每天的一小步。</p>
+      </div>
+      <div class="hero-proof">
+        <div class="avatars"><i>林</i><i>周</i><i>陈</i></div>
+        <p>已有 <b>12,860</b> 人在这里完成今日行动</p>
+      </div>
+    </div>
+
+    <div class="p1-sheet">
+      <div class="auth-seg" id="auth-seg">
+        <button class="on" data-auth="login">登录</button>
+        <button data-auth="register">注册账号</button>
+      </div>
+
+      <!-- 登录 -->
+      <div class="auth-panel" data-panel="login">
+        <h2 class="display">欢迎回来</h2>
+        <p class="sub">今天也为自己留一点向前的时间。</p>
+        <label class="field"><span>手机号</span>
+          <div class="input-wrap">
+            <span class="lead"><svg class="ico"><use href="#i-phone"/></svg></span>
+            <input class="input" type="tel" value="138 0013 8000" placeholder="请输入手机号" id="login-phone">
+          </div>
+        </label>
+        <label class="field"><span>密码</span>
+          <div class="input-wrap">
+            <span class="lead"><svg class="ico"><use href="#i-lock"/></svg></span>
+            <input class="input" type="password" value="12345678" placeholder="请输入密码" id="login-pass">
+            <button class="eye" type="button" data-toggle-pass><svg class="ico"><use href="#i-eye"/></svg></button>
+          </div>
+        </label>
+        <div class="auth-options">
+          <label class="checkbox"><input type="checkbox" checked><span class="box"><svg class="ico"><use href="#i-check"/></svg></span>记住我</label>
+          <button class="link" data-sheet-open="forgot">忘记密码？</button>
+        </div>
+        <button class="btn" data-go="p2">登录，开始今天 <svg class="ico"><use href="#i-arrow-right"/></svg></button>
+        <div class="divider"><span>或者</span></div>
+        <button class="btn ghost" data-go="p3"><svg class="ico"><use href="#i-list"/></svg>已设置过？直接进入今日</button>
+        <p class="legal">登录即表示你同意 <b>《用户协议》</b> 与 <b>《隐私政策》</b></p>
+      </div>
+
+      <!-- 注册 -->
+      <div class="auth-panel" data-panel="register" hidden>
+        <h2 class="display">从今天开始</h2>
+        <p class="sub">创建账号，开始属于你的第一段计划。</p>
+        <label class="field"><span>手机号</span>
+          <div class="input-wrap">
+            <span class="lead"><svg class="ico"><use href="#i-phone"/></svg></span>
+            <input class="input" type="tel" placeholder="请输入手机号" id="reg-phone">
+          </div>
+        </label>
+        <label class="field"><span>验证码</span>
+          <div class="input-wrap">
+            <span class="lead"><svg class="ico"><use href="#i-shield"/></svg></span>
+            <input class="input" type="tel" placeholder="请输入 6 位验证码" id="reg-code" style="padding-right:88px">
+            <button class="code-btn" type="button" data-code>获取验证码</button>
+          </div>
+        </label>
+        <label class="field"><span>设置密码</span>
+          <div class="input-wrap">
+            <span class="lead"><svg class="ico"><use href="#i-lock"/></svg></span>
+            <input class="input" type="password" placeholder="至少 6 位字符" id="reg-pass">
+            <button class="eye" type="button" data-toggle-pass><svg class="ico"><use href="#i-eye"/></svg></button>
+          </div>
+        </label>
+        <label class="checkbox" style="margin:2px 0 15px;align-items:flex-start;line-height:1.6">
+          <input type="checkbox" id="reg-agree"><span class="box" style="margin-top:1px"><svg class="ico"><use href="#i-check"/></svg></span>
+          <span>我已阅读并同意《用户协议》与《隐私政策》</span>
+        </label>
+        <button class="btn" data-register>注册并继续 <svg class="ico"><use href="#i-arrow-right"/></svg></button>
+        <p class="legal">注册后可在「我的 → 提醒设置」中开启提醒</p>
+      </div>
+    </div>
+
+    <!-- 忘记密码浮层 -->
+    <div class="sheet" data-sheet="forgot">
+      <div class="sheet-backdrop" data-sheet-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grab"></div>
+        <h3>重置密码</h3>
+        <p class="sheet-sub">输入注册手机号，我们会发送一条验证短信。</p>
+        <label class="field"><span>手机号</span><input class="input" type="tel" value="138 0013 8000"></label>
+        <div class="sheet-actions">
+          <button class="btn ghost" data-sheet-close>取消</button>
+          <button class="btn" data-sheet-close data-toast="验证短信已发送">发送验证码</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+
+<!-- ============ 02 初次使用目标设置 ============ -->
+<section class="screen" id="p2" data-name="初次使用目标设置">
+  <div class="frame-label"><span>02</span>初次使用目标设置</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-icons">
+        <svg width="17" height="11"><use href="#st-signal"/></svg>
+        <svg width="15" height="11"><use href="#st-wifi"/></svg>
+        <svg width="24" height="11"><use href="#st-battery"/></svg>
+      </span>
+    </div>
+    <div class="p2-head">
+      <span class="step-badge">首次设置 · 约 1 分钟</span>
+      <button class="text-link" data-go="p3">跳过</button>
+    </div>
+    <div class="viewport">
+      <div class="p2-body">
+        <h2 class="display">先定一个<br>想完成的目标</h2>
+        <p class="sub">不用一开始就很完美，先写下此刻最想靠近的方向。之后可以随时调整。</p>
+
+        <label class="field"><span>目标名称</span>
+          <input class="input" type="text" id="quick-goal-name" placeholder="例如：8 周完成半程马拉松" maxlength="20">
+        </label>
+
+        <div class="field" style="margin-bottom:16px">
+          <span>目标类别</span>
+          <div class="cat-grid" data-cat-group>
+            <button class="cat" data-cat="健身运动"><span class="ci"><svg class="ico"><use href="#i-run"/></svg></span><span><b>健身运动</b><em>跑步、健身、体重</em></span></button>
+            <button class="cat" data-cat="阅读学习"><span class="ci"><svg class="ico"><use href="#i-book"/></svg></span><span><b>阅读学习</b><em>读书、笔记、输入</em></span></button>
+            <button class="cat" data-cat="技能提升"><span class="ci"><svg class="ico"><use href="#i-laptop"/></svg></span><span><b>技能提升</b><em>语言、证书、创作</em></span></button>
+            <button class="cat" data-cat="生活习惯"><span class="ci"><svg class="ico"><use href="#i-leaf"/></svg></span><span><b>生活习惯</b><em>作息、饮食、整理</em></span></button>
+            <button class="cat wide" data-cat="其他"><span class="ci"><svg class="ico"><use href="#i-sparkle"/></svg></span><span><b>其他方向</b><em>写下你自己的答案</em></span></button>
+          </div>
+        </div>
+
+        <label class="field" style="margin-bottom:0"><span>期望完成日期</span>
+          <input class="input" type="date" value="2027-01-20" id="quick-goal-date">
+        </label>
+        <div class="quick-days">
+          <button data-days="30">30 天后</button>
+          <button data-days="60">60 天后</button>
+          <button data-days="90" class="on">90 天后</button>
+        </div>
+        <p class="hint">跳过也可以。完整的目标创建（描述、阶段、提醒）在「创建目标」中完成。</p>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="btn" data-quick-start>开始规划 <svg class="ico"><use href="#i-arrow-right"/></svg></button>
+    </div>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+<!-- ============ 03 首页今日任务 ============ -->
+<section class="screen" id="p3" data-name="首页今日任务">
+  <div class="frame-label"><span>03</span>首页今日任务</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-icons">
+        <svg width="17" height="11"><use href="#st-signal"/></svg>
+        <svg width="15" height="11"><use href="#st-wifi"/></svg>
+        <svg width="24" height="11"><use href="#st-battery"/></svg>
+      </span>
+    </div>
+    <div class="home-head">
+      <div>
+        <p class="home-date" id="home-date">10月28日 · 周三</p>
+        <h1 class="home-greet">早上好，林晚</h1>
+      </div>
+      <button class="avatar-btn" data-go="p10">林</button>
+    </div>
+
+    <div class="quick-actions">
+      <button class="quick" data-go="p6"><svg class="ico"><use href="#i-plus"/></svg>添加任务</button>
+      <button class="quick ghost" data-go="p4"><svg class="ico"><use href="#i-flag"/></svg>创建目标</button>
+    </div>
+
+    <div class="viewport">
+      <div class="today-card">
+        <div class="today-top">
+          <span>今日完成进度</span>
+          <b><span id="home-done">2</span><small> / 4</small></b>
+        </div>
+        <div class="progress lime"><i id="home-bar" style="width:50%"></i></div>
+        <p class="today-note" id="home-note">还有 2 件小事，就能完成今天。</p>
+      </div>
+
+      <div class="home-sec">
+        <div class="sec-head">
+          <h3>今日任务</h3>
+          <button class="link" data-go="p6">全部 6 项</button>
+        </div>
+        <div class="task-list" id="home-tasks">
+          <label class="task-row">
+            <input class="task-check" type="checkbox">
+            <span class="tick"><svg class="ico"><use href="#i-check"/></svg></span>
+            <span class="task-text"><b>晨跑 5 公里</b><em>半程马拉松 21 公里训练</em></span>
+            <span class="task-tag">07:00</span>
+          </label>
+          <label class="task-row">
+            <input class="task-check" type="checkbox" checked>
+            <span class="tick"><svg class="ico"><use href="#i-check"/></svg></span>
+            <span class="task-text"><b>阅读《深度工作》30 页</b><em>读完 12 本书</em></span>
+            <span class="task-tag">已完</span>
+          </label>
+          <label class="task-row">
+            <input class="task-check" type="checkbox" checked>
+            <span class="tick"><svg class="ico"><use href="#i-check"/></svg></span>
+            <span class="task-text"><b>背 20 个高频单词</b><em>英语口语 90 天计划</em></span>
+            <span class="task-tag">已完</span>
+          </label>
+          <label class="task-row">
+            <input class="task-check" type="checkbox">
+            <span class="tick"><svg class="ico"><use href="#i-check"/></svg></span>
+            <span class="task-text"><b>整理今日待办并排优先级</b><em>生活管理</em></span>
+            <span class="task-tag">21:00</span>
+          </label>
+        </div>
+
+        <div class="sec-head">
+          <h3>待打卡习惯</h3>
+          <button class="link" data-go="p7">去打卡</button>
+        </div>
+        <div class="habit-row">
+          <span class="habit-ico"><svg class="ico"><use href="#i-moon"/></svg></span>
+          <div class="info"><b>23:00 前睡觉</b><em>连续 12 天</em></div>
+          <button class="pill-btn" data-habit>打卡</button>
+        </div>
+        <div class="habit-row">
+          <span class="habit-ico"><svg class="ico"><use href="#i-water"/></svg></span>
+          <div class="info"><b>每天喝够 8 杯水</b><em>连续 5 天</em></div>
+          <button class="pill-btn" data-habit>打卡</button>
+        </div>
+
+        <div class="sec-head">
+          <h3>进行中的目标</h3>
+          <button class="link" data-go="p5">查看</button>
+        </div>
+        <article class="goal-mini" data-go="p5">
+          <div class="gm-top"><span class="tag mint">健身运动</span><span class="gm-pct">68%</span></div>
+          <h4>半程马拉松 21 公里训练</h4>
+          <div class="progress thin"><i style="width:68%"></i></div>
+          <p>12月08日截止 · 剩余 42 天 · 8/13 项任务</p>
+        </article>
+        <article class="goal-mini" data-go="p5">
+          <div class="gm-top"><span class="tag mint">阅读学习</span><span class="gm-pct">35%</span></div>
+          <h4>读完 12 本书</h4>
+          <div class="progress thin"><i style="width:35%"></i></div>
+          <p>12月31日截止 · 剩余 64 天 · 4/12 项任务</p>
+        </article>
+        <div style="height:18px"></div>
+      </div>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab active" data-go="p3"><span class="tab-ico"><svg class="ico"><use href="#i-home"/></svg></span>今日</button>
+      <button class="tab" data-go="p5"><span class="tab-ico"><svg class="ico"><use href="#i-target"/></svg></span>目标</button>
+      <button class="tab" data-go="p7"><span class="tab-ico"><svg class="ico"><use href="#i-check-sq"/></svg></span>打卡</button>
+      <button class="tab" data-go="p8"><span class="tab-ico"><svg class="ico"><use href="#i-trend"/></svg></span>统计</button>
+      <button class="tab" data-go="p10"><span class="tab-ico"><svg class="ico"><use href="#i-user"/></svg></span>我的</button>
+    </nav>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+
+<!-- ============ 04 创建目标 ============ -->
+<section class="screen" id="p4" data-name="创建目标">
+  <div class="frame-label"><span>04</span>创建目标</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-icons">
+        <svg width="17" height="11"><use href="#st-signal"/></svg>
+        <svg width="15" height="11"><use href="#st-wifi"/></svg>
+        <svg width="24" height="11"><use href="#st-battery"/></svg>
+      </span>
+    </div>
+    <header class="topbar">
+      <button class="icon-btn" data-back><svg class="ico"><use href="#i-arrow-left"/></svg></button>
+      <h1>创建目标</h1>
+      <button class="right" data-go="p9" style="font-size:11.5px">从模板</button>
+    </header>
+    <div class="viewport pad" style="padding-top:2px">
+      <div class="banner dark">
+        <p class="be">MAKE IT CLEAR</p>
+        <h2>把想去的地方，<br>写成一条看得见的路。</h2>
+        <p class="bn">建议目标周期为 21—90 天，更容易保持专注。</p>
+        <span class="bi"><svg class="ico"><use href="#i-flag"/></svg></span>
+      </div>
+
+      <label class="field"><span>目标名称 <em>最多 20 字</em></span>
+        <input class="input" type="text" id="new-goal-name" maxlength="20" placeholder="例如：12 周读完 6 本书">
+      </label>
+
+      <div class="field" style="margin-bottom:14px">
+        <span>目标类别</span>
+        <div class="chips" data-cat-group>
+          <button class="chip on" data-cat="健身运动">健身运动</button>
+          <button class="chip" data-cat="阅读学习">阅读学习</button>
+          <button class="chip" data-cat="技能提升">技能提升</button>
+          <button class="chip" data-cat="生活习惯">生活习惯</button>
+          <button class="chip" data-cat="其他">其他</button>
+        </div>
+      </div>
+
+      <label class="field"><span>目标描述 <em>可选</em></span>
+        <textarea class="textarea" id="new-goal-desc" maxlength="100" placeholder="写下为什么想完成它，以及完成后的样子。"></textarea>
+        <span style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--muted-2)">
+          <span>描述会出现在目标详情页</span><span class="counter" id="desc-count">0 / 100</span>
+        </span>
+      </label>
+
+      <div class="date-row">
+        <label class="field"><span>开始日期</span><input class="input" type="date" value="2026-10-28" id="new-goal-start"></label>
+        <label class="field"><span>截止日期</span><input class="input" type="date" value="2027-01-20" id="new-goal-end"></label>
+      </div>
+
+      <p class="hint">创建后会自动生成阶段计划与第一组任务，你可以在目标详情中随时增删。</p>
+      <div style="height:8px"></div>
+    </div>
+    <div class="bottom-bar">
+      <button class="btn" data-create-goal>创建目标 <svg class="ico"><use href="#i-arrow-right"/></svg></button>
+      <p class="bottom-hint" id="create-hint">还需补全：目标名称</p>
+    </div>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+
+<!-- ============ 05 目标详情与阶段计划 ============ -->
+<section class="screen" id="p5" data-name="目标详情与阶段计划">
+  <div class="frame-label"><span>05</span>目标详情与阶段计划</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-icons">
+        <svg width="17" height="11"><use href="#st-signal"/></svg>
+        <svg width="15" height="11"><use href="#st-wifi"/></svg>
+        <svg width="24" height="11"><use href="#st-battery"/></svg>
+      </span>
+    </div>
+    <header class="topbar">
+      <button class="icon-btn" data-back><svg class="ico"><use href="#i-arrow-left"/></svg></button>
+      <h1 id="goal-title">半程马拉松 21 公里训练</h1>
+      <button class="icon-btn clear" data-sheet-open="goal-more"><svg class="ico"><use href="#i-more"/></svg></button>
+    </header>
+    <div class="viewport" style="padding-top:2px">
+      <section class="goal-hero dark">
+        <p class="gh-desc" id="goal-desc">在 12 周内完成半程马拉松 21 公里，把配速稳定在 6:30，并留下一套可以复用的训练节奏。</p>
+        <div class="gh-grid">
+          <div>
+            <span class="k">当前完成度</span>
+            <span class="v"><span id="goal-pct">68</span><small>%</small></span>
+          </div>
+          <div class="right">
+            <span class="k">距离目标日</span>
+            <span class="v lime">42<small>天</small></span>
+          </div>
+        </div>
+        <div class="progress lime"><i style="width:68%"></i></div>
+        <div class="gh-meta">
+          <span><svg class="ico"><use href="#i-calendar"/></svg>09月01日 — 12月08日</span>
+          <span class="dot-sep">·</span>
+          <span>每周 3 次</span>
+        </div>
+      </section>
+
+      <div class="stat-trio">
+        <div><span>总任务</span><b>13</b><em>项</em></div>
+        <div><span>已完成</span><b>8</b><em>项</em></div>
+        <div><span>连续执行</span><b>9</b><em>天</em></div>
+      </div>
+
+      <div style="padding:0 20px">
+        <div class="sec-head">
+          <h3>阶段计划</h3>
+          <button class="text-link" data-sheet-open="stage"><svg class="ico"><use href="#i-plus"/></svg>新增阶段</button>
+        </div>
+
+        <div id="stages">
+          <div class="stage-card open">
+            <button class="stage-head" data-toggle-stage>
+              <span class="stage-no">01</span>
+              <span class="stage-info"><b>第一阶段 · 建立跑量</b><em>09月01日 — 09月28日 · 4 项任务</em></span>
+              <span class="tag mint">已完成</span>
+              <svg class="ico chev"><use href="#i-chevron-down"/></svg>
+            </button>
+            <div class="stage-body">
+              <div class="stage-task done"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>完成 5 公里轻松跑</span><em>09/03</em></div>
+              <div class="stage-task done"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>记录每周跑量并复盘</span><em>09/10</em></div>
+              <div class="stage-task done"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>核心力量训练 2 次</span><em>09/17</em></div>
+              <div class="stage-task done"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>完成一次 10 公里慢跑</span><em>09/26</em></div>
+              <button class="add-task" data-sheet-open="task" data-stage="0"><svg class="ico"><use href="#i-plus"/></svg>新增任务</button>
+            </div>
+          </div>
+
+          <div class="stage-card open active">
+            <button class="stage-head" data-toggle-stage>
+              <span class="stage-no">02</span>
+              <span class="stage-info"><b>第二阶段 · 提升配速</b><em>09月29日 — 11月02日 · 5 项任务</em></span>
+              <span class="tag lime">进行中</span>
+              <svg class="ico chev"><use href="#i-chevron-down"/></svg>
+            </button>
+            <div class="stage-body">
+              <div class="stage-task done"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>间歇跑 6 × 800 米</span><em>10/02</em></div>
+              <div class="stage-task done"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>周末长距离 14 公里</span><em>10/11</em></div>
+              <div class="stage-task done"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>调整跑姿与步频</span><em>10/18</em></div>
+              <div class="stage-task"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>节奏跑 8 公里 @6:40</span><em>10/29</em></div>
+              <div class="stage-task"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>拉伸与泡沫轴放松</span><em>11/01</em></div>
+              <button class="add-task" data-sheet-open="task" data-stage="1"><svg class="ico"><use href="#i-plus"/></svg>新增任务</button>
+            </div>
+          </div>
+
+          <div class="stage-card">
+            <button class="stage-head" data-toggle-stage>
+              <span class="stage-no">03</span>
+              <span class="stage-info"><b>第三阶段 · 赛前冲刺</b><em>11月03日 — 12月08日 · 4 项任务</em></span>
+              <span class="tag">未开始</span>
+              <svg class="ico chev"><use href="#i-chevron-down"/></svg>
+            </button>
+            <div class="stage-body">
+              <div class="stage-task"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>18 公里拉练</span><em>11/15</em></div>
+              <div class="stage-task"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>赛前两周减量训练</span><em>11/24</em></div>
+              <div class="stage-task"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>确认装备与补给</span><em>12/01</em></div>
+              <div class="stage-task"><span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>完成半程马拉松</span><em>12/08</em></div>
+              <button class="add-task" data-sheet-open="task" data-stage="2"><svg class="ico"><use href="#i-plus"/></svg>新增任务</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-head">
+          <h3>近期任务</h3>
+          <button class="link" data-go="p6">查看清单</button>
+        </div>
+        <button class="recent" data-go="p6">
+          <span class="ric"><svg class="ico"><use href="#i-run"/></svg></span>
+          <span class="rt"><b>节奏跑 8 公里 @6:40</b><em>第二阶段 · 提升配速</em></span>
+          <span class="rd">10/29</span>
+        </button>
+        <button class="recent" data-go="p6">
+          <span class="ric"><svg class="ico"><use href="#i-leaf"/></svg></span>
+          <span class="rt"><b>拉伸与泡沫轴放松</b><em>第二阶段 · 提升配速</em></span>
+          <span class="rd">11/01</span>
+        </button>
+        <button class="recent" data-go="p6">
+          <span class="ric"><svg class="ico"><use href="#i-flame"/></svg></span>
+          <span class="rt"><b>18 公里拉练</b><em>第三阶段 · 赛前冲刺</em></span>
+          <span class="rd">11/15</span>
+        </button>
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab" data-go="p3"><span class="tab-ico"><svg class="ico"><use href="#i-home"/></svg></span>今日</button>
+      <button class="tab active" data-go="p5"><span class="tab-ico"><svg class="ico"><use href="#i-target"/></svg></span>目标</button>
+      <button class="tab" data-go="p7"><span class="tab-ico"><svg class="ico"><use href="#i-check-sq"/></svg></span>打卡</button>
+      <button class="tab" data-go="p8"><span class="tab-ico"><svg class="ico"><use href="#i-trend"/></svg></span>统计</button>
+      <button class="tab" data-go="p10"><span class="tab-ico"><svg class="ico"><use href="#i-user"/></svg></span>我的</button>
+    </nav>
+
+    <!-- 新增阶段 -->
+    <div class="sheet" data-sheet="stage">
+      <div class="sheet-backdrop" data-sheet-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grab"></div>
+        <h3>新增阶段</h3>
+        <p class="sheet-sub">阶段用于把大目标切成可以完成的小段。</p>
+        <label class="field"><span>阶段名称</span><input class="input" id="stage-name" placeholder="例如：第四阶段 · 恢复与总结"></label>
+        <div class="date-row">
+          <label class="field"><span>开始日期</span><input class="input" type="date" value="2026-11-10"></label>
+          <label class="field"><span>结束日期</span><input class="input" type="date" value="2026-12-08"></label>
+        </div>
+        <div class="sheet-actions">
+          <button class="btn ghost" data-sheet-close>取消</button>
+          <button class="btn" data-add-stage>添加阶段</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新增任务 -->
+    <div class="sheet" data-sheet="task">
+      <div class="sheet-backdrop" data-sheet-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grab"></div>
+        <h3>新增任务</h3>
+        <p class="sheet-sub">任务会同时出现在对应日期的「每日任务清单」中。</p>
+        <label class="field"><span>任务名称</span><input class="input" id="task-name" placeholder="例如：轻松跑 6 公里"></label>
+        <label class="field"><span>所属阶段</span>
+          <select class="input" id="task-stage">
+            <option>第一阶段 · 建立跑量</option>
+            <option selected>第二阶段 · 提升配速</option>
+            <option>第三阶段 · 赛前冲刺</option>
+          </select>
+        </label>
+        <label class="field"><span>任务日期</span><input class="input" type="date" value="2026-10-29"></label>
+        <div class="sheet-actions">
+          <button class="btn ghost" data-sheet-close>取消</button>
+          <button class="btn" data-add-task>添加任务</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 目标更多 -->
+    <div class="sheet" data-sheet="goal-more">
+      <div class="sheet-backdrop" data-sheet-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grab"></div>
+        <h3>目标设置</h3>
+        <p class="sheet-sub">当前目标：半程马拉松 21 公里训练</p>
+        <button class="sheet-row" style="width:100%;background:transparent;border-left:0;border-right:0;border-top:0" data-go="p8"><b>查看目标数据</b><span>完成率与趋势</span></button>
+        <button class="sheet-row" style="width:100%;background:transparent;border-left:0;border-right:0;border-top:0" data-go="p10"><b>提醒设置</b><span>在个人中心调整</span></button>
+        <button class="sheet-row" style="width:100%;background:transparent;border-left:0;border-right:0;border-top:0" data-go="p6"><b>今日任务清单</b><span>勾选与新增任务</span></button>
+        <div class="sheet-actions"><button class="btn ghost" data-sheet-close>关闭</button></div>
+      </div>
+    </div>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+<!-- ============ 06 每日任务清单 ============ -->
+<section class="screen" id="p6" data-name="每日任务清单">
+  <div class="frame-label"><span>06</span>每日任务清单</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-icons">
+        <svg width="17" height="11"><use href="#st-signal"/></svg>
+        <svg width="15" height="11"><use href="#st-wifi"/></svg>
+        <svg width="24" height="11"><use href="#st-battery"/></svg>
+      </span>
+    </div>
+    <header class="topbar">
+      <button class="icon-btn" data-back><svg class="ico"><use href="#i-arrow-left"/></svg></button>
+      <h1>每日任务清单</h1>
+      <button class="icon-btn clear" data-sheet-open="newtask"><svg class="ico"><use href="#i-plus"/></svg></button>
+    </header>
+
+    <div class="date-switch">
+      <button class="icon-btn" data-day="-1"><svg class="ico" style="transform:rotate(90deg)"><use href="#i-chevron-down"/></svg></button>
+      <div class="ds-mid"><b id="p6-date">10月28日</b><span id="p6-week">周三 · 今天</span></div>
+      <button class="icon-btn" data-day="1"><svg class="ico" style="transform:rotate(-90deg)"><use href="#i-chevron-down"/></svg></button>
+    </div>
+
+    <div class="viewport pad" style="padding-top:0" id="p6-scroll">
+      <div id="p6-list"></div>
+      <div style="height:16px"></div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn" data-sheet-open="newtask"><svg class="ico"><use href="#i-plus"/></svg>新增任务</button>
+    </div>
+
+    <!-- 新增任务 -->
+    <div class="sheet" data-sheet="newtask">
+      <div class="sheet-backdrop" data-sheet-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grab"></div>
+        <h3>新增任务</h3>
+        <p class="sheet-sub">填写任务名称、日期与所属目标，保存后立即出现在清单中。</p>
+        <label class="field"><span>任务名称</span><input class="input" id="quick-task-name" placeholder="例如：慢跑 4 公里"></label>
+        <label class="field"><span>任务日期</span><input class="input" type="date" id="quick-task-date" value="2026-10-28"></label>
+        <label class="field"><span>所属目标</span>
+          <select class="input" id="quick-task-goal">
+            <option>半程马拉松 21 公里训练</option>
+            <option>读完 12 本书</option>
+            <option>英语口语 90 天计划</option>
+            <option>生活管理</option>
+          </select>
+        </label>
+        <div class="sheet-actions">
+          <button class="btn ghost" data-sheet-close>取消</button>
+          <button class="btn" data-add-quick-task>保存任务</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+
+<!-- ============ 07 习惯打卡日历 ============ -->
+<section class="screen" id="p7" data-name="习惯打卡日历">
+  <div class="frame-label"><span>07</span>习惯打卡日历</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-icons">
+        <svg width="17" height="11"><use href="#st-signal"/></svg>
+        <svg width="15" height="11"><use href="#st-wifi"/></svg>
+        <svg width="24" height="11"><use href="#st-battery"/></svg>
+      </span>
+    </div>
+    <header class="topbar" style="grid-template-columns:1fr 38px">
+      <h1 style="text-align:left;font-size:18px;font-family:var(--font-serif);letter-spacing:.03em">习惯打卡</h1>
+      <button class="icon-btn clear" data-sheet-open="newhabit"><svg class="ico"><use href="#i-plus"/></svg></button>
+    </header>
+
+    <div class="month-bar">
+      <button class="icon-btn" data-month="-1"><svg class="ico" style="transform:rotate(90deg)"><use href="#i-chevron-down"/></svg></button>
+      <b id="cal-title">2026 年 10 月</b>
+      <button class="icon-btn" data-month="1"><svg class="ico" style="transform:rotate(-90deg)"><use href="#i-chevron-down"/></svg></button>
+      <button class="text-link" data-toast="本月已打卡 22 天">本月 22 天</button>
+    </div>
+
+    <div class="viewport" style="padding-top:0">
+      <div class="cal-card">
+        <div class="cal-week"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+      <p class="cal-legend"><i class="sw"></i><span>已打卡</span><i class="sw ring"></i><span>今天</span></p>
+
+      <div style="padding:0 20px">
+        <div class="sec-head">
+          <h3>我的习惯 <span class="count">3</span></h3>
+          <button class="text-link" data-sheet-open="newhabit"><svg class="ico"><use href="#i-plus"/></svg>新增习惯</button>
+        </div>
+        <div class="habit-line">
+          <span class="habit-ico"><svg class="ico"><use href="#i-moon"/></svg></span>
+          <div class="info"><b>23:00 前睡觉</b><em>每天 · <span class="streak">连续 12 天</span></em></div>
+          <button class="pill-btn" data-habit data-streak="12">打卡</button>
+        </div>
+        <div class="habit-line">
+          <span class="habit-ico"><svg class="ico"><use href="#i-book"/></svg></span>
+          <div class="info"><b>每天阅读 30 分钟</b><em>每天 · <span class="streak">连续 7 天</span></em></div>
+          <button class="pill-btn" data-habit data-streak="7">打卡</button>
+        </div>
+        <div class="habit-line">
+          <span class="habit-ico"><svg class="ico"><use href="#i-water"/></svg></span>
+          <div class="info"><b>每天喝够 8 杯水</b><em>每天 · <span class="streak">连续 5 天</span></em></div>
+          <button class="pill-btn" data-habit data-streak="5">打卡</button>
+        </div>
+        <p class="hint">打卡记录会同步到「统计」页，中断后连续天数会重新计算。</p>
+        <div style="height:18px"></div>
+      </div>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab" data-go="p3"><span class="tab-ico"><svg class="ico"><use href="#i-home"/></svg></span>今日</button>
+      <button class="tab" data-go="p5"><span class="tab-ico"><svg class="ico"><use href="#i-target"/></svg></span>目标</button>
+      <button class="tab active" data-go="p7"><span class="tab-ico"><svg class="ico"><use href="#i-check-sq"/></svg></span>打卡</button>
+      <button class="tab" data-go="p8"><span class="tab-ico"><svg class="ico"><use href="#i-trend"/></svg></span>统计</button>
+      <button class="tab" data-go="p10"><span class="tab-ico"><svg class="ico"><use href="#i-user"/></svg></span>我的</button>
+    </nav>
+
+    <div class="sheet" data-sheet="newhabit">
+      <div class="sheet-backdrop" data-sheet-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grab"></div>
+        <h3>新增习惯</h3>
+        <p class="sheet-sub">小一点、具体一点，更容易坚持下来。</p>
+        <label class="field"><span>习惯名称</span><input class="input" id="habit-name" placeholder="例如：睡前拉伸 5 分钟"></label>
+        <label class="field"><span>频率</span>
+          <select class="input" id="habit-freq">
+            <option>每天</option>
+            <option>每周 3 次</option>
+            <option>每周 5 次</option>
+          </select>
+        </label>
+        <label class="checkbox" style="margin:2px 0 4px"><input type="checkbox" checked><span class="box"><svg class="ico"><use href="#i-check"/></svg></span>同时创建每日提醒（20:30）</label>
+        <div class="sheet-actions">
+          <button class="btn ghost" data-sheet-close>取消</button>
+          <button class="btn" data-add-habit>创建习惯</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+<!-- ============ 08 数据统计与完成趋势 ============ -->
+<section class="screen" id="p8" data-name="数据统计与完成趋势">
+  <div class="frame-label"><span>08</span>数据统计与完成趋势</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-icons">
+        <svg width="17" height="11"><use href="#st-signal"/></svg>
+        <svg width="15" height="11"><use href="#st-wifi"/></svg>
+        <svg width="24" height="11"><use href="#st-battery"/></svg>
+      </span>
+    </div>
+    <header class="topbar" style="grid-template-columns:1fr">
+      <h1 style="text-align:left;font-size:18px;font-family:var(--font-serif);letter-spacing:.03em">数据统计</h1>
+    </header>
+
+    <div class="range-seg" id="range-seg">
+      <button data-range="7" class="on">近 7 天</button>
+      <button data-range="30">近 30 天</button>
+    </div>
+    <p class="range-note" id="range-note">10月22日 — 10月28日 · 共 7 天</p>
+
+    <div class="viewport" style="padding-top:0">
+      <div class="stat-cards">
+        <div class="stat-card"><span>任务完成率</span><b><span id="stat-rate">76</span><i>%</i></b><em>较上期 +6%</em></div>
+        <div class="stat-card"><span>累计打卡</span><b><span id="stat-checkin">18</span><i>次</i></b><em>习惯共 3 个</em></div>
+        <div class="stat-card"><span>连续打卡</span><b><span id="stat-streak">9</span><i>天</i></b><em>当前最长 12 天</em></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-head">
+          <b>每日完成趋势</b>
+          <div class="chart-legend"><span><i style="background:#3C6C59"></i>完成任务</span><span><i style="background:#C3DC68"></i>全部完成</span></div>
+        </div>
+        <div class="chart" id="chart"></div>
+        <p class="chart-tip"><svg class="ico" style="width:12px;height:12px"><use href="#i-sparkle"/></svg><span id="chart-tip-text">周末完成度最高，晚上 20:00 后是你的高效时段。</span></p>
+      </div>
+
+      <div style="padding:0 20px">
+        <div class="sec-head">
+          <h3>各目标完成进度</h3>
+          <button class="link" data-go="p5">查看目标</button>
+        </div>
+        <div class="goal-progress">
+          <span class="gi"><svg class="ico"><use href="#i-run"/></svg></span>
+          <div class="gt"><b>半程马拉松 21 公里训练</b><div class="progress thin"><i style="width:68%"></i></div></div>
+          <span class="gp">68%</span>
+        </div>
+        <div class="goal-progress">
+          <span class="gi"><svg class="ico"><use href="#i-book"/></svg></span>
+          <div class="gt"><b>读完 12 本书</b><div class="progress thin"><i style="width:35%"></i></div></div>
+          <span class="gp">35%</span>
+        </div>
+        <div class="goal-progress">
+          <span class="gi"><svg class="ico"><use href="#i-laptop"/></svg></span>
+          <div class="gt"><b>英语口语 90 天计划</b><div class="progress thin"><i style="width:82%"></i></div></div>
+          <span class="gp">82%</span>
+        </div>
+        <div class="goal-progress">
+          <span class="gi"><svg class="ico"><use href="#i-leaf"/></svg></span>
+          <div class="gt"><b>生活管理 · 早睡</b><div class="progress thin"><i style="width:54%"></i></div></div>
+          <span class="gp">54%</span>
+        </div>
+        <div style="height:18px"></div>
+      </div>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab" data-go="p3"><span class="tab-ico"><svg class="ico"><use href="#i-home"/></svg></span>今日</button>
+      <button class="tab" data-go="p5"><span class="tab-ico"><svg class="ico"><use href="#i-target"/></svg></span>目标</button>
+      <button class="tab" data-go="p7"><span class="tab-ico"><svg class="ico"><use href="#i-check-sq"/></svg></span>打卡</button>
+      <button class="tab active" data-go="p8"><span class="tab-ico"><svg class="ico"><use href="#i-trend"/></svg></span>统计</button>
+      <button class="tab" data-go="p10"><span class="tab-ico"><svg class="ico"><use href="#i-user"/></svg></span>我的</button>
+    </nav>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+
+<!-- ============ 09 计划模板 ============ -->
+<section class="screen" id="p9" data-name="计划模板">
+  <div class="frame-label"><span>09</span>计划模板</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="sb-icons">
+        <svg width="17" height="11"><use href="#st-signal"/></svg>
+        <svg width="15" height="11"><use href="#st-wifi"/></svg>
+        <svg width="24" height="11"><use href="#st-battery"/></svg>
+      </span>
+    </div>
+    <header class="topbar">
+      <button class="icon-btn" data-back><svg class="ico"><use href="#i-arrow-left"/></svg></button>
+      <h1>计划模板</h1>
+      <span></span>
+    </header>
+
+    <div class="searchbar">
+      <svg class="ico"><use href="#i-search"/></svg>
+      <input type="search" id="tpl-search" placeholder="搜索模板，如 跑步 / 阅读 / 早睡">
+    </div>
+    <div class="filter-row" id="tpl-filter">
+      <button class="chip on" data-cat="全部">全部</button>
+      <button class="chip" data-cat="健身">健身</button>
+      <button class="chip" data-cat="阅读">阅读</button>
+      <button class="chip" data-cat="技能学习">技能学习</button>
+      <button class="chip" data-cat="生活管理">生活管理</button>
+      <button class="chip" data-cat="效率">效率</button>
+    </div>
+
+    <div class="viewport" style="padding-top:4px" id="tpl-scroll">
+      <div id="tpl-list">
+        <article class="tpl-card" data-cat="健身" data-key="21 天晨间跑步计划 健身 跑步 3 周 3 阶段 9 任务">
+          <div class="tpl-top">
+            <span class="tpl-ico"><svg class="ico"><use href="#i-run"/></svg></span>
+            <div class="th">
+              <h4>21 天晨间跑步计划</h4>
+              <div class="tpl-meta"><span><svg class="ico"><use href="#i-calendar"/></svg>3 周</span><span>3 个阶段 · 9 个任务</span><span>约 20 分钟 / 次</span></div>
+            </div>
+            <span class="tag mint">健身</span>
+          </div>
+          <div class="tpl-actions">
+            <span class="who">从零开始的慢慢跑</span>
+            <button class="use" data-use-tpl data-name="21 天晨间跑步计划" data-cycle="3 周 · 每天 20 分钟" data-part="3 个阶段 · 9 个任务">使用模板</button>
+          </div>
+        </article>
+
+        <article class="tpl-card" data-cat="阅读" data-key="年度阅读 24 本 阅读 读书 12 个月 4 阶段 24 任务">
+          <div class="tpl-top">
+            <span class="tpl-ico"><svg class="ico"><use href="#i-book"/></svg></span>
+            <div class="th">
+              <h4>年度阅读 24 本</h4>
+              <div class="tpl-meta"><span><svg class="ico"><use href="#i-calendar"/></svg>12 个月</span><span>4 个阶段 · 24 个任务</span><span>每周复盘</span></div>
+            </div>
+            <span class="tag mint">阅读</span>
+          </div>
+          <div class="tpl-actions">
+            <span class="who">每月两本，读得完也读得懂</span>
+            <button class="use" data-use-tpl data-name="年度阅读 24 本" data-cycle="12 个月 · 每周 3 次" data-part="4 个阶段 · 24 个任务">使用模板</button>
+          </div>
+        </article>
+
+        <article class="tpl-card" data-cat="技能学习" data-key="零基础英语口语 90 天 技能学习 语言 90 天 5 阶段 30 任务">
+          <div class="tpl-top">
+            <span class="tpl-ico"><svg class="ico"><use href="#i-laptop"/></svg></span>
+            <div class="th">
+              <h4>零基础英语口语 90 天</h4>
+              <div class="tpl-meta"><span><svg class="ico"><use href="#i-calendar"/></svg>90 天</span><span>5 个阶段 · 30 个任务</span><span>每天 15 分钟</span></div>
+            </div>
+            <span class="tag mint">技能学习</span>
+          </div>
+          <div class="tpl-actions">
+            <span class="who">从跟读到自由表达</span>
+            <button class="use" data-use-tpl data-name="零基础英语口语 90 天" data-cycle="90 天 · 每天 15 分钟" data-part="5 个阶段 · 30 个任务">使用模板</button>
+          </div>
+        </article>
+
+        <article class="tpl-card" data-cat="生活管理" data-key="21 天早睡早起 生活管理 睡眠 3 周 2 阶段 6 任务">
+          <div class="tpl-top">
+            <span class="tpl-ico"><svg class="ico"><use href="#i-moon"/></svg></span>
+            <div class="th">
+              <h4>21 天早睡早起</h4>
+              <div class="tpl-meta"><span><svg class="ico"><use href="#i-calendar"/></svg>3 周</span><span>2 个阶段 · 6 个任务</span><span>含睡前打卡</span></div>
+            </div>
+            <span class="tag mint">生活管理</span>
+          </div>
+          <div class="tpl-actions">
+            <span class="who">把作息调回自己的节奏</span>
+            <button class="use" data-use-tpl data-name="21 天早睡早起" data-cycle="3 周 · 每天" data-part="2 个阶段 · 6 个任务">使用模板</button>
+          </div>
+        </article>
+
+        <article class="tpl-card" data-cat="效率" data-key="每周复盘习惯 效率 复盘 4 周 1 阶段 4 任务">
+          <div class="tpl-top">
+            <span class="tpl-ico"><svg class="ico"><use href="#i-list"/></svg></span>
+            <div class="th">
+              <h4>每周复盘习惯</h4>
+              <div class="tpl-meta"><span><svg class="ico"><use href="#i-calendar"/></svg>4 周</span><span>1 个阶段 · 4 个任务</span><span>周日 30 分钟</span></div>
+            </div>
+            <span class="tag mint">效率</span>
+          </div>
+          <div class="tpl-actions">
+            <span class="who">把一周的经验留下来</span>
+            <button class="use" data-use-tpl data-name="每周复盘习惯" data-cycle="4 周 · 每周 1 次" data-part="1 个阶段 · 4 个任务">使用模板</button>
+          </div>
+        </article>
+
+        <article class="tpl-card" data-cat="健身" data-key="俯卧撑 100 个进阶 健身 力量 6 周 3 阶段 12 任务">
+          <div class="tpl-top">
+            <span class="tpl-ico"><svg class="ico"><use href="#i-flame"/></svg></span>
+            <div class="th">
+              <h4>俯卧撑 100 个进阶</h4>
+              <div class="tpl-meta"><span><svg class="ico"><use href="#i-calendar"/></svg>6 周</span><span>3 个阶段 · 12 个任务</span><span>隔天训练</span></div>
+            </div>
+            <span class="tag mint">健身</span>
+          </div>
+          <div class="tpl-actions">
+            <span class="who">分组递进，不硬撑</span>
+            <button class="use" data-use-tpl data-name="俯卧撑 100 个进阶" data-cycle="6 周 · 每周 3 次" data-part="3 个阶段 · 12 个任务">使用模板</button>
+          </div>
+        </article>
+      </div>
+      <p class="no-result" id="tpl-empty" hidden>没有找到相关模板，换个关键词试试。</p>
+      <div style="height:20px"></div>
+    </div>
+
+    <div class="sheet" data-sheet="use-tpl">
+      <div class="sheet-backdrop" data-sheet-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grab"></div>
+        <h3>确认使用模板</h3>
+        <p class="sheet-sub">将按模板生成目标、阶段与任务，创建后仍可自由调整。</p>
+        <div class="sheet-row"><b id="tpl-name">21 天晨间跑步计划</b><span>模板</span></div>
+        <div class="sheet-row"><span>执行节奏</span><span id="tpl-cycle">3 周 · 每天 20 分钟</span></div>
+        <div class="sheet-row"><span>包含内容</span><span id="tpl-part">3 个阶段 · 9 个任务</span></div>
+        <label class="field" style="margin-top:14px"><span>目标名称</span><input class="input" id="tpl-goal-name" value="21 天晨间跑步计划"></label>
+        <label class="field"><span>开始日期</span><input class="input" type="date" value="2026-10-28"></label>
+        <div class="sheet-actions">
+          <button class="btn ghost" data-sheet-close>再看看</button>
+          <button class="btn" data-confirm-tpl>确认并创建</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+
+<!-- ============ 10 个人中心与提醒设置 ============ -->
+<section class="screen" id="p10" data-name="个人中心与提醒设置">
+  <div class="frame-label"><span>10</span>个人中心与提醒设置</div>
+  <div class="phone">
+    <div class="profile-hero">
+      <div class="statusbar on-dark">
+        <span>9:41</span>
+        <span class="sb-icons">
+          <svg width="17" height="11"><use href="#st-signal"/></svg>
+          <svg width="15" height="11"><use href="#st-wifi"/></svg>
+          <svg width="24" height="11"><use href="#st-battery"/></svg>
+        </span>
+      </div>
+      <div class="profile-row">
+        <span class="avatar lg">林</span>
+        <div style="flex:1">
+          <h2>林晚</h2>
+          <p>已坚持 48 天 · 计划与打卡用户</p>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div><b>4</b><span>我的目标</span></div>
+        <div><b>128</b><span>累计完成任务</span></div>
+        <div><b>96</b><span>累计打卡天数</span></div>
+      </div>
+    </div>
+
+    <div class="viewport" style="padding-top:0">
+      <div class="section-label">提醒设置</div>
+      <div class="setting-card">
+        <div class="setting-row">
+          <span class="sr-ico"><svg class="ico"><use href="#i-bell"/></svg></span>
+          <div class="txt"><b>每日任务提醒</b><em>每天在设定时间提醒今日任务</em></div>
+          <button class="switch on" data-switch="task"></button>
+        </div>
+        <div class="setting-row sub">
+          <span class="lab">提醒时间</span>
+          <input class="time-input" type="time" value="08:30" id="time-task">
+        </div>
+        <div class="setting-row">
+          <span class="sr-ico"><svg class="ico"><use href="#i-check-sq"/></svg></span>
+          <div class="txt"><b>打卡提醒</b><em>睡前提醒还没完成的习惯</em></div>
+          <button class="switch on" data-switch="habit"></button>
+        </div>
+        <div class="setting-row sub">
+          <span class="lab">提醒时间</span>
+          <input class="time-input" type="time" value="20:30" id="time-habit">
+        </div>
+      </div>
+      <p class="hint" style="margin:8px 24px 0">提醒以本地通知发出，关闭系统通知权限后将无法收到。</p>
+
+      <div class="section-label">计划</div>
+      <div class="setting-card">
+        <button class="setting-row" data-go="p9">
+          <span class="sr-ico"><svg class="ico"><use href="#i-grid"/></svg></span>
+          <div class="txt"><b>计划模板</b><em>从成熟模板快速开始</em></div>
+          <svg class="ico chev"><use href="#i-chevron-right"/></svg>
+        </button>
+        <button class="setting-row" data-go="p4">
+          <span class="sr-ico"><svg class="ico"><use href="#i-flag"/></svg></span>
+          <div class="txt"><b>创建新目标</b><em>写下下一个想完成的方向</em></div>
+          <svg class="ico chev"><use href="#i-chevron-right"/></svg>
+        </button>
+      </div>
+
+      <div style="padding:0 20px">
+        <button class="logout" data-sheet-open="logout"><svg class="ico"><use href="#i-logout"/></svg>退出登录</button>
+        <p class="hint" style="text-align:center;margin:10px 0 16px">计划与打卡 · 版本 1.0.0</p>
+      </div>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab" data-go="p3"><span class="tab-ico"><svg class="ico"><use href="#i-home"/></svg></span>今日</button>
+      <button class="tab" data-go="p5"><span class="tab-ico"><svg class="ico"><use href="#i-target"/></svg></span>目标</button>
+      <button class="tab" data-go="p7"><span class="tab-ico"><svg class="ico"><use href="#i-check-sq"/></svg></span>打卡</button>
+      <button class="tab" data-go="p8"><span class="tab-ico"><svg class="ico"><use href="#i-trend"/></svg></span>统计</button>
+      <button class="tab active" data-go="p10"><span class="tab-ico"><svg class="ico"><use href="#i-user"/></svg></span>我的</button>
+    </nav>
+
+    <div class="sheet" data-sheet="logout">
+      <div class="sheet-backdrop" data-sheet-close></div>
+      <div class="sheet-panel">
+        <div class="sheet-grab"></div>
+        <h3>退出登录？</h3>
+        <p class="sheet-sub">退出后本地的任务与打卡数据仍会保留，下次登录可继续。</p>
+        <div class="sheet-actions">
+          <button class="btn ghost" data-sheet-close>取消</button>
+          <button class="btn" data-logout>退出登录</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" data-toastbox></div>
+  </div>
+</section>
+<script>
+(function(){
+  const app = document.getElementById('app');
+  const stage = document.getElementById('stage');
+  const screens = [...document.querySelectorAll('.screen')];
+  const $ = (s, r=document) => r.querySelector(s);
+  let mode = 'board';
+  let current = 'p1';
+  let hist = [];
+
+  /* ---------- mode & pager ---------- */
+  $('#pager').innerHTML = screens.map((s,i)=>
+    `<button data-page="${s.id}" title="${s.dataset.name}">${String(i+1).padStart(2,'0')}</button>`).join('');
+
+  function updatePager(){
+    document.querySelectorAll('#pager button').forEach(b=>b.classList.toggle('on', b.dataset.page===current));
+  }
+  function setMode(m){
+    mode = m;
+    app.classList.toggle('board', m==='board');
+    app.classList.toggle('demo', m==='demo');
+    document.querySelectorAll('#mode-seg button').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));
+    $('#toolbar-hint').textContent = m==='board'
+      ? '点击任意页面进入演示，页面内的入口可直接跳转'
+      : '演示模式：所有按钮与入口均可点击，可用上方页码快速切换';
+    if(m==='demo'){ document.getElementById(current).classList.add('active'); updatePager(); }
+  }
+  function setPage(id, push=true){
+    if(!document.getElementById(id)) return;
+    if(push && id!==current) hist.push(current);
+    current = id;
+    screens.forEach(s=>s.classList.toggle('active', s.id===id));
+    closeSheets();
+    const vp = document.getElementById(id).querySelector('.viewport');
+    if(vp) vp.scrollTop = 0;
+    updatePager();
+    if(mode==='board'){
+      document.getElementById(id).scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  }
+  function go(id){
+    if(mode==='board') setMode('demo');
+    setPage(id);
+  }
+  function closeSheets(){
+    document.querySelectorAll('.sheet.open').forEach(s=>s.classList.remove('open'));
+  }
+  function toast(phone, msg){
+    const t = phone.querySelector('[data-toastbox]');
+    if(!t || !msg) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>t.classList.remove('show'), 1900);
+  }
+  const phoneOf = el => el.closest('.phone');
+
+  /* ---------- click delegation ---------- */
+  document.addEventListener('click', e => {
+    const t = e.target;
+
+    const pagerBtn = t.closest('#pager button');
+    if(pagerBtn){ if(mode!=='demo') setMode('demo'); setPage(pagerBtn.dataset.page); return; }
+
+    const modeBtn = t.closest('#mode-seg button');
+    if(modeBtn){ setMode(modeBtn.dataset.mode); return; }
+
+    const back = t.closest('[data-back]');
+    if(back){
+      const prev = hist.length ? hist.pop() : 'p3';
+      setPage(prev, false);
+      return;
+    }
+
+    const closer = t.closest('[data-sheet-close]');
+    if(closer){ closeSheets(); }
+
+    const opener = t.closest('[data-sheet-open]');
+    if(opener){
+      const phone = phoneOf(opener);
+      if(mode === 'board'){ setMode('demo'); setPage(phone.closest('.screen').id, false); }
+      const sheet = phone.querySelector(`.sheet[data-sheet="${opener.dataset.sheetOpen}"]`);
+      if(sheet){
+        if(opener.dataset.sheetOpen === 'task' && opener.dataset.stage !== undefined){
+          pendingStage = +opener.dataset.stage;
+          const sel = sheet.querySelector('#task-stage');
+          if(sel) sel.selectedIndex = pendingStage;
+        }
+        sheet.classList.add('open');
+      }
+      return;
+    }
+
+    const goEl = t.closest('[data-go]');
+    if(goEl){ e.preventDefault(); go(goEl.dataset.go); return; }
+
+    const toastEl = t.closest('[data-toast]');
+    if(toastEl){
+      toast(phoneOf(toastEl), toastEl.dataset.toast);
+    }
+
+    /* login / register tabs */
+    const authBtn = t.closest('#auth-seg button');
+    if(authBtn){
+      document.querySelectorAll('#auth-seg button').forEach(b=>b.classList.toggle('on', b===authBtn));
+      document.querySelectorAll('[data-panel]').forEach(p=>{
+        p.hidden = p.dataset.panel !== authBtn.dataset.auth;
+      });
+      return;
+    }
+    const eye = t.closest('[data-toggle-pass]');
+    if(eye){
+      const input = eye.parentElement.querySelector('input');
+      input.type = input.type === 'password' ? 'text' : 'password';
+      return;
+    }
+    const codeBtn = t.closest('[data-code]');
+    if(codeBtn){
+      let n = 60;
+      codeBtn.disabled = true;
+      codeBtn.style.opacity = '.55';
+      codeBtn.textContent = n + 's 后重发';
+      const timer = setInterval(()=>{
+        n--;
+        codeBtn.textContent = n + 's 后重发';
+        if(n<=0){ clearInterval(timer); codeBtn.disabled=false; codeBtn.style.opacity=1; codeBtn.textContent='重新获取'; }
+      },1000);
+      toast(phoneOf(codeBtn), '验证码已发送');
+      return;
+    }
+
+    /* category select */
+    const cat = t.closest('[data-cat]');
+    if(cat && cat.closest('[data-cat-group]')){
+      const group = cat.closest('[data-cat-group]');
+      group.querySelectorAll('[data-cat]').forEach(c=>c.classList.toggle('on', c===cat));
+      return;
+    }
+
+    /* quick day chips */
+    const qd = t.closest('[data-days]');
+    if(qd){
+      qd.parentElement.querySelectorAll('[data-days]').forEach(b=>b.classList.toggle('on', b===qd));
+      const d = new Date(2026,9,28);
+      d.setDate(d.getDate() + (+qd.dataset.days));
+      const iso = d.toISOString().slice(0,10);
+      const field = document.getElementById('quick-goal-date');
+      if(field) field.value = iso;
+      return;
+    }
+
+    /* home checkbox handled by change event */
+    /* habit check-in */
+    const habit = t.closest('[data-habit]');
+    if(habit){
+      const on = habit.classList.toggle('done');
+      habit.innerHTML = on
+        ? '<svg class="ico"><use href="#i-check"/></svg>已打卡'
+        : '打卡';
+      const info = habit.closest('.habit-line, .habit-row');
+      const streak = info && info.querySelector('.streak');
+      if(streak){
+        const base = +habit.dataset.streak || 0;
+        streak.textContent = '连续 ' + (on ? base + 1 : base) + ' 天';
+      }
+      if(on){
+        calHits.add(28);
+        renderCal();
+        toast(phoneOf(habit), '打卡成功，继续保持');
+      } else {
+        toast(phoneOf(habit), '已取消今日打卡');
+      }
+      return;
+    }
+
+    /* stage accordion */
+    const sh = t.closest('[data-toggle-stage]');
+    if(sh){ sh.closest('.stage-card').classList.toggle('open'); return; }
+
+    /* p2 quick goal start */
+    const qs = t.closest('[data-quick-start]');
+    if(qs){
+      const name = ($('#quick-goal-name').value || '').trim() || '我的第一个目标';
+      applyGoal(name, '这是你刚刚定下的方向，先完成第一步，再慢慢把它走完。');
+      setPage('p5');
+      toast(phoneOf(qs), '目标已创建，开始第一阶段吧');
+      return;
+    }
+
+    /* p4 create goal */
+    const cg = t.closest('[data-create-goal]');
+    if(cg){
+      const name = ($('#new-goal-name').value || '').trim();
+      if(!name){
+        $('#create-hint').textContent = '请先填写目标名称';
+        $('#create-hint').style.color = 'var(--danger)';
+        $('#new-goal-name').focus();
+        toast(phoneOf(cg), '请先填写目标名称');
+        return;
+      }
+      const desc = ($('#new-goal-desc').value || '').trim() || '把目标拆成阶段，一步一步完成它。';
+      applyGoal(name, desc);
+      setPage('p5');
+      toast(phoneOf(cg), '目标已创建');
+      return;
+    }
+
+    /* add stage */
+    const as = t.closest('[data-add-stage]');
+    if(as){
+      const phone = phoneOf(as);
+      const input = phone.querySelector('#stage-name');
+      const name = (input.value || '').trim();
+      if(!name){ toast(phone, '请填写阶段名称'); input.focus(); return; }
+      const wrap = phone.querySelector('#stages');
+      const count = wrap.querySelectorAll('.stage-card').length;
+      const card = document.createElement('div');
+      card.className = 'stage-card open';
+      card.innerHTML = `
+        <button class="stage-head" data-toggle-stage>
+          <span class="stage-no">${String(count+1).padStart(2,'0')}</span>
+          <span class="stage-info"><b>${name}</b><em>11月10日 — 12月08日 · 0 项任务</em></span>
+          <span class="tag">未开始</span>
+          <svg class="ico chev"><use href="#i-chevron-down"/></svg>
+        </button>
+        <div class="stage-body">
+          <button class="add-task" data-sheet-open="task" data-stage="${count}"><svg class="ico"><use href="#i-plus"/></svg>新增任务</button>
+        </div>`;
+      wrap.appendChild(card);
+      input.value = '';
+      closeSheets();
+      toast(phone, '阶段已添加');
+      return;
+    }
+
+    /* add task in stage */
+    const at = t.closest('[data-add-task]');
+    if(at){
+      const phone = phoneOf(at);
+      const name = (phone.querySelector('#task-name').value || '').trim();
+      if(!name){ toast(phone, '请填写任务名称'); return; }
+      const cards = [...phone.querySelectorAll('#stages .stage-card')];
+      const target = cards[pendingStage] || cards[0];
+      const body = target.querySelector('.stage-body');
+      const btn = body.querySelector('.add-task');
+      const task = document.createElement('div');
+      task.className = 'stage-task';
+      task.innerHTML = `<span class="dot"><svg class="ico"><use href="#i-check"/></svg></span><span>${name}</span><em>10/29</em>`;
+      body.insertBefore(task, btn);
+      const info = target.querySelector('.stage-info em');
+      const n = body.querySelectorAll('.stage-task').length;
+      info.textContent = info.textContent.replace(/·\s*\d+\s*项任务/, `· ${n} 项任务`);
+      phone.querySelector('#task-name').value = '';
+      closeSheets();
+      toast(phone, '任务已添加到阶段');
+      return;
+    }
+
+    /* p6 day switch */
+    const dayBtn = t.closest('[data-day]');
+    if(dayBtn){
+      p6.offset += (+dayBtn.dataset.day);
+      renderP6();
+      return;
+    }
+    /* p6 add quick task */
+    const aq = t.closest('[data-add-quick-task]');
+    if(aq){
+      const phone = phoneOf(aq);
+      const name = (phone.querySelector('#quick-task-name').value || '').trim();
+      if(!name){ toast(phone, '请填写任务名称'); return; }
+      const goal = phone.querySelector('#quick-task-goal').value;
+      const list = p6Tasks[p6.offset] || (p6Tasks[p6.offset] = []);
+      list.push({name, goal, done:false});
+      phone.querySelector('#quick-task-name').value = '';
+      renderP6();
+      closeSheets();
+      toast(phone, '任务已添加');
+      return;
+    }
+
+    /* p7 month switch */
+    const mb = t.closest('[data-month]');
+    if(mb){
+      const d = new Date(cal.y, cal.m + (+mb.dataset.month), 1);
+      cal.y = d.getFullYear(); cal.m = d.getMonth();
+      renderCal();
+      return;
+    }
+    const cd = t.closest('[data-cal]');
+    if(cd){
+      const d = +cd.dataset.cal;
+      const hit = cd.classList.contains('hit');
+      toast(phoneOf(cd), `${cal.m+1}月${d}日 · ${hit ? '已打卡' : '未打卡'}`);
+      return;
+    }
+    const ah = t.closest('[data-add-habit]');
+    if(ah){
+      const phone = phoneOf(ah);
+      const input = phone.querySelector('#habit-name');
+      const name = (input.value || '').trim();
+      if(!name){ toast(phone, '请填写习惯名称'); input.focus(); return; }
+      const freq = phone.querySelector('#habit-freq').value;
+      const line = document.createElement('div');
+      line.className = 'habit-line';
+      line.innerHTML = `<span class="habit-ico"><svg class="ico"><use href="#i-star"/></svg></span>
+        <div class="info"><b>${name}</b><em>${freq} · <span class="streak">连续 0 天</span></em></div>
+        <button class="pill-btn" data-habit data-streak="0">打卡</button>`;
+      phone.querySelector('.hint').insertAdjacentElement('beforebegin', line);
+      input.value = '';
+      closeSheets();
+      toast(phone, '习惯已创建');
+      return;
+    }
+
+    /* p8 range */
+    const rng = t.closest('[data-range]');
+    if(rng){
+      document.querySelectorAll('#range-seg button').forEach(b=>b.classList.toggle('on', b===rng));
+      renderRange(+rng.dataset.range);
+      return;
+    }
+
+    /* p9 filter chips */
+    const fc = t.closest('#tpl-filter [data-cat]');
+    if(fc){
+      document.querySelectorAll('#tpl-filter .chip').forEach(c=>c.classList.toggle('on', c===fc));
+      tplCat = fc.dataset.cat;
+      filterTpl();
+      return;
+    }
+    const use = t.closest('[data-use-tpl]');
+    if(use){
+      pendingTpl = use.dataset.name;
+      const phone = phoneOf(use);
+      phone.querySelector('#tpl-name').textContent = use.dataset.name;
+      phone.querySelector('#tpl-cycle').textContent = use.dataset.cycle;
+      phone.querySelector('#tpl-part').textContent = use.dataset.part;
+      phone.querySelector('#tpl-goal-name').value = use.dataset.name;
+      phone.querySelector('.sheet[data-sheet="use-tpl"]').classList.add('open');
+      return;
+    }
+    const confirmTpl = t.closest('[data-confirm-tpl]');
+    if(confirmTpl){
+      const phone = phoneOf(confirmTpl);
+      const name = (phone.querySelector('#tpl-goal-name').value || '').trim() || pendingTpl;
+      applyGoal(name, `来自「${pendingTpl}」模板：按阶段推进，每完成一项就记录一次。`);
+      closeSheets();
+      setPage('p5');
+      toast(phone, '模板已应用，目标创建成功');
+      return;
+    }
+
+    /* p10 switches */
+    const sw = t.closest('[data-switch]');
+    if(sw){
+      const on = sw.classList.toggle('on');
+      const map = { task:'#time-task', habit:'#time-habit' };
+      const input = phoneOf(sw).querySelector(map[sw.dataset.switch]);
+      if(input) input.disabled = !on;
+      toast(phoneOf(sw), (sw.dataset.switch==='task'?'每日任务提醒':'打卡提醒') + (on ? '已开启' : '已关闭'));
+      return;
+    }
+    const lo = t.closest('[data-logout]');
+    if(lo){
+      closeSheets();
+      hist = [];
+      setPage('p1', false);
+      toast(phoneOf(lo), '已退出登录');
+      return;
+    }
+
+    /* board: click any frame to open it in demo mode */
+    const frame = t.closest('.screen');
+    if(frame && mode === 'board'){ setMode('demo'); setPage(frame.id, false); }
+  });
+
+  /* ---------- changes ---------- */
+  document.addEventListener('change', e => {
+    if(e.target.classList.contains('task-check')){
+      updateHome();
+    }
+    if(e.target.closest('#p6-list')){
+      const i = +e.target.dataset.i;
+      const list = p6Tasks[p6.offset];
+      if(list && list[i]){ list[i].done = e.target.checked; renderP6(); }
+    }
+    if(e.target.id === 'new-goal-name'){
+      const v = e.target.value.trim();
+      const hint = $('#create-hint');
+      hint.textContent = v ? '信息已完整，可以创建' : '还需补全：目标名称';
+      hint.style.color = v ? 'var(--sage)' : 'var(--muted-2)';
+    }
+  });
+  document.addEventListener('input', e => {
+    if(e.target.id === 'new-goal-desc'){
+      $('#desc-count').textContent = e.target.value.length + ' / 100';
+    }
+    if(e.target.id === 'tpl-search'){
+      tplQuery = e.target.value.trim().toLowerCase();
+      filterTpl();
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') closeSheets();
+  });
+
+  /* ---------- shared state ---------- */
+  let pendingStage = 1;
+  let pendingTpl = '21 天晨间跑步计划';
+  let tplCat = '全部';
+  let tplQuery = '';
+
+  function applyGoal(name, desc){
+    const title = $('#goal-title');
+    if(title) title.textContent = name;
+    const d = $('#goal-desc');
+    if(d && desc) d.textContent = desc;
+  }
+
+  /* ---------- p3 home ---------- */
+  function updateHome(){
+    const boxes = [...document.querySelectorAll('#home-tasks .task-check')];
+    if(!boxes.length) return;
+    const done = boxes.filter(b=>b.checked).length;
+    const total = boxes.length;
+    $('#home-done').textContent = done;
+    $('#home-bar').style.width = (done/total*100) + '%';
+    $('#home-note').textContent = done === total
+      ? '今天的 4 项任务都完成了，给自己一点奖励。'
+      : `还有 ${total-done} 件小事，就能完成今天。`;
+    boxes.forEach(b=>{
+      const tag = b.closest('.task-row').querySelector('.task-tag');
+      if(tag) tag.textContent = b.checked ? '已完' : (tag.textContent === '已完' ? '待办' : tag.textContent);
+    });
+  }
+  updateHome();
+
+  /* ---------- p6 ---------- */
+  const BASE = new Date(2026, 9, 28);
+  const p6 = { offset: 0 };
+  const p6Tasks = {
+    0: [
+      {name:'晨跑 5 公里', goal:'半程马拉松 21 公里训练', done:false},
+      {name:'整理今日待办并排优先级', goal:'生活管理', done:false},
+      {name:'拉伸 10 分钟', goal:'半程马拉松 21 公里训练', done:false},
+      {name:'阅读《深度工作》30 页', goal:'读完 12 本书', done:true},
+      {name:'背 20 个高频单词', goal:'英语口语 90 天计划', done:true},
+      {name:'写 3 行今日复盘', goal:'生活管理', done:true}
+    ],
+    1: [
+      {name:'节奏跑 8 公里 @6:40', goal:'半程马拉松 21 公里训练', done:false},
+      {name:'阅读 20 页小说', goal:'读完 12 本书', done:false},
+      {name:'练口语跟读 15 分钟', goal:'英语口语 90 天计划', done:false}
+    ],
+    '-1': [
+      {name:'轻松跑 4 公里', goal:'半程马拉松 21 公里训练', done:true},
+      {name:'阅读《深度工作》25 页', goal:'读完 12 本书', done:true},
+      {name:'23:00 前睡觉', goal:'生活管理', done:true}
+    ]
+  };
+  const WD = ['周日','周一','周二','周三','周四','周五','周六'];
+  function dateLabel(offset){
+    const d = new Date(BASE); d.setDate(d.getDate() + offset);
+    return { md: `${d.getMonth()+1}月${d.getDate()}日`, wd: WD[d.getDay()],
+      rel: offset===0 ? '今天' : offset===1 ? '明天' : offset===-1 ? '昨天' : `${d.getMonth()+1}/${d.getDate()}`,
+      iso: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` };
+  }
+  function renderP6(){
+    const lab = dateLabel(p6.offset);
+    $('#p6-date').textContent = lab.md;
+    $('#p6-week').textContent = `${lab.wd} · ${lab.rel}`;
+    const list = p6Tasks[p6.offset] || [];
+    const todo = list.map((t,i)=>({...t, i})).filter(t=>!t.done);
+    const done = list.map((t,i)=>({...t, i})).filter(t=>t.done);
+    const row = t => `
+      <label class="task-row">
+        <input class="task-check" type="checkbox" data-i="${t.i}" ${t.done?'checked':''}>
+        <span class="tick"><svg class="ico"><use href="#i-check"/></svg></span>
+        <span class="task-text"><b>${t.name}</b><em>${t.goal}</em></span>
+      </label>`;
+    let html = '';
+    if(!list.length){
+      html = `<div class="empty"><svg class="ico"><use href="#i-calendar"/></svg>这一天还没有任务<br>点击下方「新增任务」开始安排</div>`;
+    } else {
+      html += `<div class="group-label">待完成 <span class="count">${todo.length}</span></div>
+        <div class="task-list">${todo.map(row).join('') || '<div class="empty" style="padding:18px 0">这一天没有待完成任务</div>'}</div>
+        <div class="group-label">已完成 <span class="count">${done.length}</span></div>
+        <div class="task-list">${done.map(row).join('') || '<div class="empty" style="padding:18px 0">还没有完成的任务</div>'}</div>`;
+    }
+    $('#p6-list').innerHTML = html;
+    const vp = $('#p6-scroll'); if(vp) vp.scrollTop = 0;
+    const qt = $('#quick-task-date'); if(qt) qt.value = lab.iso;
+  }
+  renderP6();
+
+  /* ---------- p7 calendar ---------- */
+  const cal = { y: 2026, m: 9 };
+  const calHits = new Set([1,2,3,5,6,7,8,9,10,12,13,14,15,16,17,19,20,21,22,23,24,26,27]);
+  function renderCal(){
+    const title = $('#cal-title');
+    if(title) title.textContent = `${cal.y} 年 ${cal.m+1} 月`;
+    const first = new Date(cal.y, cal.m, 1);
+    const startIdx = (first.getDay() + 6) % 7;
+    const total = new Date(cal.y, cal.m+1, 0).getDate();
+    const prevTotal = new Date(cal.y, cal.m, 0).getDate();
+    let html = '';
+    for(let i=0;i<startIdx;i++){
+      html += `<button class="cal-day out" disabled>${prevTotal - startIdx + 1 + i}</button>`;
+    }
+    for(let d=1; d<=total; d++){
+      const isOct = cal.y===2026 && cal.m===9;
+      const hit = isOct && calHits.has(d);
+      const today = isOct && d===28;
+      html += `<button class="cal-day ${hit?'hit':''} ${today?'today':''}" data-cal="${d}"><span>${d}</span><i class="mark"></i></button>`;
+    }
+    const tail = (7 - ((startIdx + total) % 7)) % 7;
+    for(let i=1;i<=tail;i++){
+      html += `<button class="cal-day out" disabled>${i}</button>`;
+    }
+    const grid = $('#cal-grid');
+    if(grid) grid.innerHTML = html;
+  }
+  renderCal();
+
+  /* ---------- p8 stats ---------- */
+  const stats7 = { rate:76, checkin:18, streak:9,
+    bars:[3,4,5,6,4,6,4], note:'10月22日 — 10月28日 · 共 7 天' };
+  const stats30 = { rate:68, checkin:74, streak:9,
+    bars:[4,3,2,5,4,3,6,2,4,5,3,4,6,5,2,3,4,5,3,6,4,2,5,4,3,6,5,4,3,4],
+    note:'09月29日 — 10月28日 · 共 30 天' };
+  function renderRange(n){
+    const d = n === 7 ? stats7 : stats30;
+    $('#stat-rate').textContent = d.rate;
+    $('#stat-checkin').textContent = d.checkin;
+    $('#stat-streak').textContent = d.streak;
+    $('#range-note').textContent = d.note;
+    const box = $('#chart');
+    const max = 6;
+    const step = n === 30 ? 5 : 1;
+    box.innerHTML = d.bars.map((v,i)=>{
+      const day = new Date(2026,9,28);
+      day.setDate(day.getDate() - (d.bars.length - 1 - i));
+      const label = n === 7 ? `${day.getDate()}` : (i % step === 0 ? `${day.getMonth()+1}/${day.getDate()}` : '');
+      return `<div class="bar-wrap">
+        <div class="bar-track"><div class="bar ${v>=6?'hi':''}" style="height:${Math.round(v/max*100)}%"></div></div>
+        <em>${label}</em>
+      </div>`;
+    }).join('');
+    $('#chart-tip-text').textContent = n === 7
+      ? '这 7 天里有 2 天完成全部任务，晚上 20:00 后是你的高效时段。'
+      : '这 30 天里有 4 天完成全部任务，周中比周末更稳定。';
+  }
+  renderRange(7);
+
+  /* ---------- p9 templates ---------- */
+  function filterTpl(){
+    let shown = 0;
+    document.querySelectorAll('#tpl-list .tpl-card').forEach(card=>{
+      const okCat = tplCat === '全部' || card.dataset.cat === tplCat;
+      const okKey = !tplQuery || card.dataset.key.toLowerCase().includes(tplQuery)
+        || card.querySelector('h4').textContent.toLowerCase().includes(tplQuery);
+      const show = okCat && okKey;
+      card.hidden = !show;
+      if(show) shown++;
+    });
+    $('#tpl-empty').hidden = shown > 0;
+  }
+
+  /* ---------- init ---------- */
+  document.querySelectorAll('.viewport').forEach(v=>{ v.scrollTop = 0; });
+  setMode('board');
+  hist = ['p1'];
+})();
+</script>
+</body>
+</html>
